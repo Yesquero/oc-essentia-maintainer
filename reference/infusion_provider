@@ -1,0 +1,6 @@
+type; thaumicenergistics_infusion_provider
+getAspectCount; function(aspect:string):number -- Get amount of specific aspect stored in this block
+getAspectNames; function():table -- Get the names of aspects stored in the block
+slot; -1
+getAspects; function():table -- Get the Aspects stored in the block
+address; a3bc6eae-e594-40b6-a138-1695681ebf15

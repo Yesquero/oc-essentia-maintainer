@@ -1,0 +1,17 @@
+getAvgPowerInjection; function():number -- Get the average power injection into the network.
+getInterfaceConfiguration; function(side:number[, slot:number]):table -- Get the configuration of the interface pointing in the specified direction.
+isNetworkPowered; function():boolean -- True if the AE network is considered online
+getEnergyDemand; function():number -- Returns the energy demand on the AE network
+getFluidsInNetwork; function():table -- Get a list of the stored fluids in the network.
+getAvgPowerUsage; function():number -- Get the average power usage of the network.
+getCpus; function():table -- Get a list of tables representing the available CPUs in the network.
+store; function([filter:table, dbAddress:string, startSlot:number, count:number]): bool -- Store items in the network matching the specified filter in the database with the specified address.
+getIdlePowerUsage; function():number -- Get the idle power usage of the network.
+getCraftables; function([filter:table]):table -- Get a list of known item recipes. These can be used to issue crafting requests.
+getStoredPower; function():number -- Get the stored power in the network. 
+address; eb222d9d-5116-4bfd-a432-9c4975733423
+type; me_interface
+setInterfaceConfiguration; function(side:number[, slot:number][, database:address, entry:number[, size:number]]):boolean -- Configure the interface pointing in the specified direction.
+slot; -1
+getItemsInNetwork; function([filter:table]):table -- Get a list of the stored items in the network.
+getMaxStoredPower; function():number -- Get the maximum stored power in the network.
