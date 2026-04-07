@@ -1,0 +1,4 @@
+{
+    "lua.debug.settings.luaVersion": "lua53",
+    "lua.debug.settings.path": "${workspaceFolder}/?.lua"
+}
