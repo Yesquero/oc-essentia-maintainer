@@ -1,36 +1,49 @@
-local essentiaMaintainer = require( "maintainer" )
+local essentiaMaintainer = require( "oces.maintainer" )
+local util = require( "oces.utility" )
+local constants = require( "oces.constants" )
 
-local constants = {
+local testConstants = {
     cfgPath = "test/data/oces.cfg",
-    recordsPath = "test/data/oces-records.txt"
+    recordsPath = "test/data/oces-records.txt",
+    defaultPollingInterval = 5,
+    defaultPriority = 10
 }
 
-local function clearRecords()
-    local file = assert( io.open( constants.recordsPath, "w" ) )
+local function clearFile( filename )
+    local file = assert( io.open( filename, "w" ) )
     file:write( "{}" )
     file:close()
 end
 
-local function maintainerSetupTest()
-    local maintainer = essentiaMaintainer.Maintainer:new( { defaultCfgPath = constants.cfgPath } )
+local function maintainerTests()
+    local maintainer = essentiaMaintainer.Maintainer:new( { configPath = testConstants.cfgPath } )
 
-    assert( maintainer.config.defaultPriority == 0 )
-    assert( maintainer.config.pollingInterval == 10 )
-    assert( maintainer.config.recordsPath == "/etc/oces-records.txt" )
+    assert( util.comparePOD( maintainer.config,
+                             {
+                                 defaultPriority = constants.defaultPriority,
+                                 pollingInterval = constants
+                                     .defaultPollingInterval,
+                                 recordsPath = constants.defaultRecordsPath
+                             } ) )
 
     maintainer:readConfig()
-    assert( maintainer.config.defaultPriority == -1 )
-    assert( maintainer.config.pollingInterval == 5 )
-    assert( maintainer.config.recordsPath == constants.recordsPath )
+    assert( util.comparePOD( maintainer.config,
+                             {
+                                 defaultPriority = testConstants.defaultPriority,
+                                 pollingInterval = testConstants.defaultPollingInterval,
+                                 recordsPath =
+                                     testConstants.recordsPath
+                             } ) )
 
-    clearRecords()
+    clearFile( maintainer.config.recordsPath )
 
     maintainer:readRecords()
     assert( #maintainer.aspectList == 0 )
 
-    maintainer:addAspect( "Vitium", 100, 25 )
     maintainer:addAspect( "Metallum", 1000, nil )
-    assert( #maintainer.aspectList == 2 )
+    maintainer:addAspect( "Vitium", 100, 25 )
+    assert( #maintainer.aspectList == 2 and util.comparePOD( maintainer.aspectLookup, { Metallum = 2, Vitium = 1 } ) )
+    assert( maintainer.aspectList[2].name == "Metallum" )
 
     maintainer.aspectList = {}
     assert( #maintainer.aspectList == 0 )
@@ -39,10 +52,19 @@ local function maintainerSetupTest()
     assert( #maintainer.aspectList == 2 )
     assert( maintainer.aspectList[1].name == "Vitium" )
     assert( maintainer.aspectList[2].priority == maintainer.config.defaultPriority )
+
+    local res, msg = maintainer:deleteAspect( "test" )
+    assert( res == false )
+
+    res = maintainer:deleteAspect( "Vitium" )
+    assert( res == true )
+    maintainer:readRecords()
+    assert( #maintainer.aspectList == 1 and util.comparePOD( maintainer.aspectLookup, { Metallum = 1 } ) )
+    assert( maintainer.aspectList[1].name == "Metallum" )
 end
 
 local function runTests()
-    maintainerSetupTest()
+    maintainerTests()
 
     print( "Tests finished" )
 end

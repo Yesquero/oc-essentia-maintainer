@@ -1,1 +1,1 @@
-{{name="Vitium",priority=25,amount=100},{name="Metallum",priority=-1,amount=1000}}
+{[2]={name="Metallum",amount=1000,priority=10}}
