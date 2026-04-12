@@ -4,13 +4,15 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "lua",
             "request": "launch",
             "name": "Debug",
             "console": "internalConsole",
-            "outputCapture": ["stdout"],
+            "outputCapture": [
+                "stdout",
+                "stderr"
+            ],
             "luaVersion": "lua53",
             "program": "${file}"
         }
