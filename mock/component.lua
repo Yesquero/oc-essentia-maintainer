@@ -1,9 +1,9 @@
-local database = require( "mock.database" )
+local database = require("mock.database")
 
 ---@class Component
 local component = {
-    ---@type DatabaseComponent
-    database = database
+	---@type DatabaseComponent
+	database = database,
 }
 
 return component

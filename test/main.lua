@@ -1,15 +1,17 @@
-local utilityTest = require( "test.utility" )
-local maintainerTest = require( "test.maintainer" )
-local itemDBTest = require( "test.item-database" )
+local itemDBTest = require("test.item-database")
+local maintainerTest = require("test.maintainer")
+local utilityTest = require("test.utility")
 
 local function runTests()
-    utilityTest.testArrayRemove()
+	print("Running tests...")
 
-    maintainerTest.setup()
+	utilityTest.testArrayRemove()
 
-    itemDBTest.setup()
+	maintainerTest.setup()
 
-    print( "Tests complete" )
+	itemDBTest.setup()
+
+	print("Tests complete")
 end
 
 runTests()

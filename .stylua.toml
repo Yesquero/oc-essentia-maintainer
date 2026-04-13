@@ -1,0 +1,4 @@
+syntax = "Lua53"
+
+[sort_requires]
+enabled = true

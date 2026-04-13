@@ -4,5 +4,12 @@
     "Lua.workspace.library": [
         "${workspaceFolder}/src",
         "${workspaceFolder/mock"
-    ]
+    ],
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua",
+        "editor.formatOnSave": true
+    },
+    "stylua.configPath": "${workspaceFolder}/.stylua.toml",
+    "stylua.searchParentDirectories": true,
+    "stylua.searchBinaryInPATH": true,
 }

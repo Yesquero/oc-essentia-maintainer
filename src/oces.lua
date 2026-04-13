@@ -1,3 +1,3 @@
-require( "mock.general" )
+require("mock.general")
 
-print( "test" )
+print("test")
