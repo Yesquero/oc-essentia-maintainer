@@ -1,6 +1,10 @@
 local utility = {}
 
--- TODO: handle table values but without metatable
+---Does a shallow compare on Plain Old Data tables.
+---TODO: handle table values but without metatable
+---@param left table
+---@param right table
+---@return boolean
 function utility.comparePOD( left, right )
     if left == nil and right == nil then return true end
     if left == nil or right == nil then return false end
@@ -20,11 +24,12 @@ function utility.comparePOD( left, right )
     return true
 end
 
---[[
-Remove elements from an array, returns false if no elements removed.
-cmp accepts signle arg, the valaue of arrray[i] at each iteration and must return true if it is to be removed, false otherwise.
-A variantion of https://stackoverflow.com/a/53038524
- ]]
+---Remove elements from an array, returns false if no elements removed.
+---cmp accepts signle arg, the valaue of arrray[i] at each iteration and must return true if it is to be removed, false otherwise.
+---A variantion of https://stackoverflow.com/a/53038524
+---@param array any[]
+---@param cmp fun(any): boolean
+---@return boolean
 function utility.arrayRemove( array, cmp )
     if #array == 0 then
         return false
@@ -46,6 +51,9 @@ function utility.arrayRemove( array, cmp )
     return len ~= #array
 end
 
+---Clear a file, is the file is meant to be used with OC serialization methods pass true as second arg write {} to the file
+---@param filename string
+---@param isSerializationTarget boolean?
 function utility.clearFile( filename, isSerializationTarget )
     local file = assert( io.open( filename, "w" ) )
     local isSerializationTarget = isSerializationTarget or false

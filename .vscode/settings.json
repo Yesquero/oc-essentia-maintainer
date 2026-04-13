@@ -2,7 +2,7 @@
     "lua.debug.settings.luaVersion": "lua53",
     "lua.debug.settings.path": "${workspaceFolder}/?.lua;${workspaceFolder}/mock/?.lua;${workspaceFolder}/test/?.lua;${workspaceFolder}/src/?.lua",
     "Lua.workspace.library": [
-        "${workspaceFolder}/src/oces",
+        "${workspaceFolder}/src",
         "${workspaceFolder/mock"
     ]
 }
