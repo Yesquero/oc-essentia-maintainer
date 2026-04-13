@@ -17,27 +17,29 @@ function utilityTest.testArrayRemove()
     res = util.arrayRemove( arr, function( val )
         return val == 3
     end )
-    assert( res and util.comparePOD( arr, { 1, 2, 4, 5, 6 } ) )
+    assert( res and util.compareTables( arr, { 1, 2, 4, 5, 6 } ) )
 
     res = util.arrayRemove( arr, function( val )
         return val == 1
     end )
-    assert( res and util.comparePOD( arr, { 2, 4, 5, 6 } ) )
+    assert( res and util.compareTables( arr, { 2, 4, 5, 6 } ) )
 
     res = util.arrayRemove( arr, function( val )
         return val == 6
     end )
-    assert( res and util.comparePOD( arr, { 2, 4, 5 } ) )
+    assert( res and util.compareTables( arr, { 2, 4, 5 } ) )
 
     res = util.arrayRemove( arr, function( val )
         return val == 2 or val == 5
     end )
-    assert( res and util.comparePOD( arr, { 4 } ) )
+    assert( res and util.compareTables( arr, { 4 } ) )
 
     res = util.arrayRemove( arr, function( val )
         return val == 4
     end )
-    assert( res and util.comparePOD( arr, {} ) )
+    assert( res and util.compareTables( arr, {} ) )
+
+    print( "utilityTest.testArrayRemove complete" )
 end
 
 return utilityTest

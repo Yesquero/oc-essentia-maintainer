@@ -13,7 +13,7 @@ function essentiaStorage.IEssentiaStorage:new( o )
 end
 
 ---Retruns dict of stored aspects.
----@return {[ string]: integer }
+---@return { [string]: integer }
 function essentiaStorage.IEssentiaStorage:getAspects()
     error( "Not implemented" )
 end

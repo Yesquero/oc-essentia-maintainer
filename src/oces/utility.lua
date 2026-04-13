@@ -1,24 +1,24 @@
 local utility = {}
 
----Does a shallow compare on Plain Old Data tables.
----TODO: handle table values but without metatable
+---Does a nested compare on tables, untested.
+---TODO: add support for nested tables excluding metatables
 ---@param left table
 ---@param right table
 ---@return boolean
-function utility.comparePOD( left, right )
+function utility.compareTables( left, right )
     if left == nil and right == nil then return true end
     if left == nil or right == nil then return false end
 
-    assert( type( left ) == "table" and type( right ) == "table" )
+    if type( left ) ~= type( right ) then return false end
+
+    if type( left ) ~= "table" then return left == right end
 
     for k, v in pairs( left ) do
-        assert( type( v ) ~= "table" )
-        if right[k] ~= v then return false end
+        if not utility.compareTables( right[k], v ) then return false end
     end
 
     for k, v in pairs( right ) do
-        assert( type( v ) ~= "table" )
-        if left[k] ~= v then return false end
+        if not utility.compareTables( left[k], v ) then return false end
     end
 
     return true
