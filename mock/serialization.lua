@@ -126,6 +126,7 @@ function serialization.serialize( value, pretty )
     if pretty then
         local truncate = 0
         while limit > 0 and truncate do
+            ---@diagnostic disable-next-line: cast-local-type
             truncate = string.find( result, "\n", truncate + 1, true )
             limit = limit - 1
         end
@@ -138,6 +139,7 @@ end
 
 function serialization.unserialize( data )
     if not type( data ) == "string" then error( "Bad argument #1" ) end
+    ---@diagnostic disable-next-line: undefined-global
     local result, reason = load( "return " .. data, "=data", _, { math = { huge = math.huge } } )
     if not result then
         return nil, reason

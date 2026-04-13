@@ -1,6 +1,7 @@
 local serialization = require( "serialization" )
 
 local constants = require( "oces.constants" )
+local util = require( "oces.utility" )
 
 local essentiaMaintainer = {}
 
@@ -14,7 +15,8 @@ essentiaMaintainer.Maintainer = {
     aspectList = {},
     aspectLookup = {},
     configPath = constants.defaultCfgPath,
-    config = config
+    config = config,
+    essentiaStorage = nil
 }
 
 function essentiaMaintainer.Maintainer:new( o )
@@ -45,6 +47,7 @@ function essentiaMaintainer.Maintainer:readRecords()
     return true
 end
 
+-- TODO: add check against a list of known aspects
 function essentiaMaintainer.Maintainer:addAspect( name, amount, priority )
     assert( name and type( name ) == "string", "addAspect invalid argument(s)" )
     assert( amount and type( amount == "number" and amount > 0 ), "addAspect invalid argument(s)" )
@@ -69,12 +72,12 @@ function essentiaMaintainer.Maintainer:deleteAspect( name )
     self:readRecords()
     if #self.aspectList == 0 then return true end
 
-    for i = 1, #self.aspectList do
-        if self.aspectList[i].name == name then
-            self.aspectList[i] = nil
-            self:saveRecords()
-            return true
-        end
+    local res = util.arrayRemove( self.aspectList, function( val )
+        return val.name == name
+    end )
+    if res then
+        self:saveRecords()
+        return true
     end
 
     return false, "Could not find saved aspect with matching name: " .. name
@@ -94,7 +97,7 @@ function essentiaMaintainer.Maintainer:saveRecords()
 end
 
 function essentiaMaintainer.Maintainer:rebuildLookup()
-    if not #self.aspectLookup == 0 then self.aspectLookup = {} end
+    self.aspectLookup = {}
 
     local sortByPriority = function( left, right )
         return left.priority > right.priority
