@@ -8,11 +8,11 @@ local function runTests()
 
 	mockEssentiaStorage.setup()
 
-	-- utilityTest.testArrayRemove()
+	utilityTest.testArrayRemove()
 
-	-- maintainerTest.setup()
+	maintainerTest.setup()
 
-	-- itemDBTest.setup()
+	itemDBTest.setup()
 
 	print("Tests complete")
 end

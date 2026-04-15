@@ -1,7 +1,7 @@
 local constants = require("oces.constants")
 local essentiaMaintainer = require("oces.maintainer")
 local testConstants = require("test.constants")
-local util = require("oces.utility")
+local util = require("ysq.utility")
 
 local maintainerTest = {}
 
@@ -26,7 +26,7 @@ function maintainerTest.setup()
 	maintainer:readRecords()
 	assert(#maintainer.aspectList == 0)
 
-	maintainer:addAspect("Metallum", 1000, nil)
+	maintainer:addAspect("Metallum", 1000)
 	maintainer:addAspect("Vitium", 100, 25)
 	assert(#maintainer.aspectList == 2 and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 1 }))
 	assert(maintainer.aspectList[2].name == "Metallum")

@@ -1,7 +1,7 @@
 local serialization = require("serialization")
 
 local constants = require("oces.constants")
-local util = require("oces.utility")
+local util = require("ysq.utility")
 
 local essentiaMaintainer = {}
 

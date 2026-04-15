@@ -1,7 +1,7 @@
-local constants = require("mock.constants")
+local constants = require("test.constants")
 local essentiStorage = require("oces.interface.essentia-storage")
 local serialization = require("serialization")
-local util = require("oces.utility")
+local util = require("ysq.utility")
 
 local mockEssentiaStorage = {}
 
@@ -24,7 +24,7 @@ function mockEssentiaStorage.MockES:getAspects()
 end
 
 function mockEssentiaStorage.MockES:init()
-	local file = assert(io.open(constants.dummyAspectsFile), "Caould not open mock getAspect file.")
+	local file = assert(io.open(constants.getAspectsDataFile), "Caould not open mock getAspect file.")
 	self.dummyData = assert(serialization.unserialize(file:read("a")))
 end
 
