@@ -1,0 +1,11 @@
+getAllStacks; function():table -- Get a list of descriptions for all item stacks in this inventory.
+transferStack; function(slotA:number, slotB:number[, count:number=math.huge]):boolean -- Move up to the specified number of items from the first specified slot to the second.
+address; 004001fa-e4c1-40ff-b112-99bb592f4b80
+getSlotMaxStackSize; function(slot:number):number -- Get the maximum stack size of the item stack in the specified slot.
+getInventorySize; function():number -- Get the number of slots in this inventory.
+compareStacks; function(slotA:number, slotB:number):boolean -- Compare the two item stacks in the specified slots for equality.
+slot; -1
+getStackInSlot; function(slot:number):table -- Get a description of the item stack in the specified slot.
+getSlotStackSize; function(slot:number):number -- Get the stack size of the item stack in the specified slot.
+type; thaumcraft
+getInventoryName; function():string -- Get the name of this inventory.

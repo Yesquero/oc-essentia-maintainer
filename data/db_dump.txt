@@ -1,0 +1,10 @@
+{oreNames={"blockGlass"},size=1,name="tconstruct:clear_glass",id=8138,damage=0,maxSize=64,label="Clear Glass",aspects={Vitreus=5},hasTag=false,maxDamage=0}
+{oreNames={"rodBlitz"},size=1,name="thermalfoundation:material",id=4668,damage=2050,maxSize=64,label="Blitz Rod",aspects={Aer=15,Alkimia=5},hasTag=false,maxDamage=0}
+{oreNames={"rodBlaze","itemBlazeRod"},size=1,name="minecraft:blaze_rod",id=369,damage=0,maxSize=64,label="Blaze Rod",aspects={Potentia=5,Ignis=15},hasTag=false,maxDamage=0}
+{oreNames={"ingotLead"},size=1,name="thermalfoundation:material",id=4668,damage=131,maxSize=64,label="Lead Ingot",aspects={Ordo=5,Metallum=10},hasTag=false,maxDamage=0}
+{oreNames={"sand","blockSand"},size=1,name="minecraft:sand",id=12,damage=0,maxSize=64,label="Sand",aspects={Perditio=5,Terra=5},hasTag=false,maxDamage=0}
+{oreNames={},size=1,name="thaumcraft:vishroom",id=7278,damage=0,maxSize=64,label="Vishroom",aspects={Mortuus=1,Herba=2,Vitium=8,Praecantatio=1,Perditio=1},hasTag=false,maxDamage=0}
+{oreNames={"gearStone"},size=1,name="thermalfoundation:material",id=4668,damage=23,maxSize=64,label="Stone Gear",aspects={Machina=5},hasTag=false,maxDamage=0}
+{oreNames={"bookshelfOak","bookshelf"},size=1,name="minecraft:bookshelf",id=47,damage=0,maxSize=64,label="Oak Bookshelf",aspects={Cognitio=8},hasTag=false,maxDamage=0}
+{oreNames={"gemCoal","coal","itemCoal"},size=1,name="minecraft:coal",id=263,damage=0,maxSize=64,label="Coal",aspects={Potentia=10,Ignis=10},hasTag=false,maxDamage=0}
+{oreNames={"bone"},size=1,name="minecraft:bone",id=352,damage=0,maxSize=64,label="Bone",aspects={Mortuus=5,Victus=5},hasTag=false,maxDamage=0}
