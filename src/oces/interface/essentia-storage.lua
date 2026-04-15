@@ -4,11 +4,12 @@ local essentiaStorage = {}
 essentiaStorage.IEssentiaStorage = {}
 
 ---@return IEssentiaStorage
-function essentiaStorage.IEssentiaStorage:new(o)
-	o = o or {}
-	setmetatable(o, self)
+function essentiaStorage.IEssentiaStorage:new(prototype)
+	prototype = prototype or {}
+	setmetatable(prototype, self)
 	self.__index = self
-	return o
+	self:init()
+	return prototype
 end
 
 ---Retruns dict of stored aspects.
@@ -22,6 +23,11 @@ end
 ---@return integer
 function essentiaStorage.IEssentiaStorage:getAspect(name)
 	error("Not implemented")
+end
+
+---Virtual initialization function
+function essentiaStorage.IEssentiaStorage:init()
+	return
 end
 
 return essentiaStorage

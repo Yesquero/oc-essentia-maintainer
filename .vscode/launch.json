@@ -7,7 +7,7 @@
         {
             "type": "lua",
             "request": "launch",
-            "name": "Debug",
+            "name": "File Debug",
             "console": "internalConsole",
             "outputCapture": [
                 "stdout",
@@ -15,6 +15,18 @@
             ],
             "luaVersion": "lua53",
             "program": "${file}"
+        },
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Tests Debug",
+            "console": "internalConsole",
+            "outputCapture": [
+                "stdout",
+                "stderr"
+            ],
+            "luaVersion": "lua53",
+            "program": "${workspaceFolder}/test/main.lua"
         }
     ]
 }

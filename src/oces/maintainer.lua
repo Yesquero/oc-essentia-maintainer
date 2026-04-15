@@ -24,13 +24,13 @@ essentiaMaintainer.Maintainer = {
 }
 
 ---Create an instance.
----@param o table?
+---@param prototype table?
 ---@return Maintainer
-function essentiaMaintainer.Maintainer:new(o)
-	o = o or {}
-	setmetatable(o, self)
+function essentiaMaintainer.Maintainer:new(prototype)
+	prototype = prototype or {}
+	setmetatable(prototype, self)
 	self.__index = self
-	return o
+	return prototype
 end
 
 ---Read config from a file.
@@ -84,7 +84,7 @@ end
 ---Delete aspect with given name from the list of aspects to maintain.
 ---Returns false if no matching aspect found or aspect list is empty.
 ---Assumes readRecords() will be called sometime afterwards, meant to be used from CLI.
----TODO: current implementation readRecords will be run before aspectList or aspectLookup will be accessed again, this should be fine if its only called from cli though.
+---TODO: current implementation assumes readRecords will be run before aspectList or aspectLookup will be accessed again, this should be fine if its only called from cli though.
 ---@param name string
 ---@return boolean
 ---@return string?
@@ -138,9 +138,20 @@ function essentiaMaintainer.Maintainer:rebuildLookup()
 	end
 end
 
+---Returns a dict of missing aspects.
+---@return { [string]: integer }
 function essentiaMaintainer.Maintainer:getMissingAspects()
 	local availableAspects = self.essentiaStorage:getAspects()
-	return {}
+	local missingAspect = {}
+
+	for key, val in pairs(self.aspectLookup) do
+		local amount = val - (availableAspects[key] or 0)
+		if amount > 0 then
+			missingAspect[key] = amount
+		end
+	end
+
+	return missingAspect
 end
 
 return essentiaMaintainer

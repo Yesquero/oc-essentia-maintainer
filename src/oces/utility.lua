@@ -1,7 +1,6 @@
 local utility = {}
 
----Does a nested compare on tables, untested.
----TODO: add support for nested tables excluding metatables
+---Does a nested compare on tables, uses  untested.
 ---@param left table
 ---@param right table
 ---@return boolean

@@ -1,5 +1,5 @@
 local component = require("component")
-local itemDB = require("oces.item-database")
+local itemDatabse = require("oces.item-database")
 local util = require("oces.utility")
 
 local itemDBTest = {}
@@ -18,8 +18,8 @@ local expectedItems = {
 }
 
 function itemDBTest.setup()
-	local itemDB = itemDB.ItemDB
-	itemDB.init(component.database)
+	local itemDB = itemDatabse.ItemDB:new()
+	itemDB:init(component.database)
 
 	assert(util.compareTables(itemDB.items, expectedItems))
 	assert(util.compareTables(itemDB.aspectLookup["Ignis"], {

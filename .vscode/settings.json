@@ -10,4 +10,8 @@
         "editor.formatOnSave": true
     },
     "stylua.searchParentDirectories": true,
+    // we try to make semantic highlighting look good
+    "editor.semanticHighlighting.enabled": true,
+    // prevent VSCode from modifying the terminal colors
+    "terminal.integrated.minimumContrastRatio": 1,
 }
