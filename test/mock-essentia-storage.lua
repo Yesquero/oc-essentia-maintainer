@@ -24,7 +24,7 @@ function mockEssentiaStorage.MockES:getAspects()
 end
 
 function mockEssentiaStorage.MockES:init()
-	local file = assert(io.open(constants.getAspectsDataFile), "Caould not open mock getAspect file.")
+	local file = assert(io.open(constants.getAspectsDataFile), "Could not open mock getAspect file.")
 	self.dummyData = assert(serialization.unserialize(file:read("a")))
 end
 

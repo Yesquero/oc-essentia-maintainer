@@ -1,6 +1,6 @@
 local utility = {}
 
----Does a nested compare on tables, uses  untested.
+---Does a nested compare on tables, uses == on non table values, untested.
 ---@param left table
 ---@param right table
 ---@return boolean
@@ -38,6 +38,7 @@ end
 ---Remove elements from an array, returns false if no elements removed.
 ---cmp accepts signle arg, the valaue of arrray[i] at each iteration and must return true if it is to be removed, false otherwise.
 ---A variantion of https://stackoverflow.com/a/53038524
+---TODO: add optional is array arg an array check
 ---@param array any[]
 ---@param cmp fun(any): boolean
 ---@return boolean
