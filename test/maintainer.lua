@@ -1,12 +1,13 @@
+local EssentiaMaintainer = require("oces.maintainer")
 local constants = require("oces.constants")
-local essentiaMaintainer = require("oces.maintainer")
 local testConstants = require("test.constants")
 local util = require("ysq.utility")
 
 local maintainerTest = {}
 
-function maintainerTest.setup()
-	local maintainer = essentiaMaintainer.Maintainer:new({ configPath = testConstants.cfgPath })
+function maintainerTest.unitTest()
+	---@diagnostic disable-next-line:param-type-mismatch
+	local maintainer = EssentiaMaintainer:new(testConstants.cfgPath, nil)
 
 	assert(util.compareTables(maintainer.config, {
 		defaultPriority = constants.defaultPriority,
@@ -48,7 +49,7 @@ function maintainerTest.setup()
 	assert(#maintainer.aspectList == 1 and util.compareTables(maintainer.aspectLookup, { Metallum = 1 }))
 	assert(maintainer.aspectList[1].name == "Metallum")
 
-	print("maintainerTest.setup complete")
+	print("maintainerTest.unitTest complete")
 end
 
 return maintainerTest

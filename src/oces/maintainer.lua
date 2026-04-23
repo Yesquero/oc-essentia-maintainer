@@ -1,43 +1,36 @@
 local serialization = require("serialization")
 
+local Class = require("ysq.class")
 local constants = require("oces.constants")
 local util = require("ysq.utility")
 
-local essentiaMaintainer = {}
-
+---@class MaintainerConfig
 local config = {
 	defaultPriority = constants.defaultPriority,
 	pollingInterval = constants.defaultPollingInterval,
 	recordsPath = constants.defaultRecordsPath,
 }
 
----@class Maintainer
-essentiaMaintainer.Maintainer = {
-	---@type {name: string, amount: integer, priority: integer}[]
+---@class Maintainer: AbstractClass
+---@field aspectList {name: string, amount: integer, priority: integer}[]
+---@field aspectLookup { [string]: integer }
+---@field configPath string
+---@field config MaintainerConfig
+---@field essentiaStorage IEssentiaStorage
+---@field new fun(self, configPath: string, essentiaStorage: IEssentiaStorage): Maintainer
+local EssentiaMaintainer = Class:inherit({
 	aspectList = {},
-	---@type { [string]: integer }
 	aspectLookup = {},
 	configPath = constants.defaultCfgPath,
 	config = config,
-	---@type IEssentiaStorage
 	essentiaStorage = nil,
-}
-
----Create an instance.
----@param prototype table?
----@return Maintainer
-function essentiaMaintainer.Maintainer:new(prototype)
-	prototype = prototype or {}
-	setmetatable(prototype, self)
-	self.__index = self
-	return prototype
-end
+})
 
 ---Read config from a file.
 ---TODO: create file with default values if none exists
 ---TODO: sanity check values
 ---@return boolean
-function essentiaMaintainer.Maintainer:readConfig()
+function EssentiaMaintainer:readConfig()
 	local file = assert(io.open(self.configPath, "r"), "Could not open config file.")
 	self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
 	file:close()
@@ -48,7 +41,7 @@ end
 ---Read list of aspects to maintain from a file.
 ---TODO: handle empty file case
 ---@return boolean
-function essentiaMaintainer.Maintainer:readRecords()
+function EssentiaMaintainer:readRecords()
 	local file = assert(io.open(self.config.recordsPath, "r"), "Could not open records file.")
 	self.aspectList = assert(serialization.unserialize(file:read("a")), "Error when reading records file.")
 	file:close()
@@ -64,7 +57,7 @@ end
 ---@param amount integer
 ---@param priority integer?
 ---@return boolean
-function essentiaMaintainer.Maintainer:addAspect(name, amount, priority)
+function EssentiaMaintainer:addAspect(name, amount, priority)
 	assert(name and type(name) == "string", "addAspect invalid argument(s)")
 	assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
 
@@ -88,7 +81,7 @@ end
 ---@param name string
 ---@return boolean
 ---@return string?
-function essentiaMaintainer.Maintainer:deleteAspect(name)
+function EssentiaMaintainer:deleteAspect(name)
 	assert(name and type(name) == "string", "deleteAspect invalid argument(s)")
 
 	self:readRecords()
@@ -109,13 +102,13 @@ end
 
 ---Uses OC serialization pretty print to visualize currently maintained aspects.
 ---@return string
-function essentiaMaintainer.Maintainer:showAspectList()
+function EssentiaMaintainer:showAspectList()
 	return serialization.serialize(self.aspectList, true)
 end
 
 ---Save current list of maintained aspect to a file.
 ---@return boolean
-function essentiaMaintainer.Maintainer:saveRecords()
+function EssentiaMaintainer:saveRecords()
 	local file = assert(io.open(self.config.recordsPath, "w"))
 	file = assert(io.open(self.config.recordsPath, "w"), "Error when writing to records file.")
 	file:write(serialization.serialize(self.aspectList))
@@ -125,7 +118,7 @@ function essentiaMaintainer.Maintainer:saveRecords()
 end
 
 ---Rebuild aspects lookup table based on maintained aspects.
-function essentiaMaintainer.Maintainer:rebuildLookup()
+function EssentiaMaintainer:rebuildLookup()
 	self.aspectLookup = {}
 
 	local sortByPriority = function(left, right)
@@ -138,9 +131,15 @@ function essentiaMaintainer.Maintainer:rebuildLookup()
 	end
 end
 
+---TODO check args ?
+function EssentiaMaintainer:initialize(configPath, essentiaStorage)
+	self.configPath = configPath
+	self.essentiaStorage = essentiaStorage
+end
+
 ---Returns a dict of missing aspects.
 ---@return { [string]: integer }
-function essentiaMaintainer.Maintainer:getMissingAspects()
+function EssentiaMaintainer:getMissingAspects()
 	local availableAspects = self.essentiaStorage:getAspects()
 	local missingAspect = {}
 
@@ -154,4 +153,4 @@ function essentiaMaintainer.Maintainer:getMissingAspects()
 	return missingAspect
 end
 
-return essentiaMaintainer
+return EssentiaMaintainer

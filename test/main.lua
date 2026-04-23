@@ -6,13 +6,13 @@ local utilityTest = require("test.utility")
 local function runTests()
 	print("Running tests...")
 
-	mockEssentiaStorage.setup()
+	mockEssentiaStorage.unitTest()
 
 	utilityTest.testArrayRemove()
 
-	maintainerTest.setup()
+	maintainerTest.unitTest()
 
-	itemDBTest.setup()
+	itemDBTest.unitTest()
 
 	print("Tests complete")
 end

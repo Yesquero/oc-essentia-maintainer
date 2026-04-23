@@ -1,5 +1,5 @@
+local ItemDatabase = require("oces.item-database")
 local component = require("component")
-local itemDatabse = require("oces.item-database")
 local util = require("ysq.utility")
 local itemDBTest = {}
 
@@ -16,9 +16,8 @@ local expectedItems = {
 	{ label = "Bone", aspects = { Mortuus = 5, Victus = 5 } },
 }
 
-function itemDBTest.setup()
-	local itemDB = itemDatabse.ItemDB:new()
-	itemDB:init(component.database)
+function itemDBTest.unitTest()
+	local itemDB = ItemDatabase:new(component.database)
 
 	assert(util.compareTables(itemDB.items, expectedItems))
 	assert(util.compareTables(itemDB.aspectLookup["Ignis"], {
@@ -37,7 +36,7 @@ function itemDBTest.setup()
 		{ slot = 6, amount = 1 },
 	}))
 
-	print("itemDBTest.setup complete")
+	print("itemDBTest.unitTest complete")
 end
 
 return itemDBTest
