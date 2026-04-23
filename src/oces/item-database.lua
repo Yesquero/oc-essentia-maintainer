@@ -1,30 +1,21 @@
+local Class = require("ysq.class")
 local constants = require("oces.constants")
 
-local itemDatabase = {}
-
----@class ItemDB
-itemDatabase.ItemDB = {
-	---@type DatabaseComponent
+---@class ItemDB: AbstractClass
+---@field new fun(self: ItemDB, dbComponent: table): ItemDB
+---@field dbComponent DatabaseComponent
+---@field items { label: string, aspects: Aspects[] }[]
+---@field aspectLookup { [string]: { slot: integer, amount: integer }[]}
+---@field numSlots integer
+local ItemDatabase = Class:inherit({
 	dbComponent = nil,
-	---@type  { label: string, aspects: Aspects[] }[]
 	items = {},
-	---@type { [string]: { slot: integer, amount: integer }[]}
 	aspectLookup = {},
 	numSlots = constants.databaseSlots,
-}
-
----Creates an instance
----@param protoype table?
----@return ItemDB
-function itemDatabase.ItemDB:new(protoype)
-	protoype = protoype or {}
-	setmetatable(protoype, self)
-	self.__index = self
-	return protoype
-end
+})
 
 ---Initializes list of available items
-function itemDatabase.ItemDB:initializeItems()
+function ItemDatabase:initializeItems()
 	assert(self.dbComponent)
 	for i = 1, self.numSlots do
 		local entry = self.dbComponent.get(i)
@@ -38,7 +29,7 @@ function itemDatabase.ItemDB:initializeItems()
 end
 
 ---Rebuild aspect lookup table
-function itemDatabase.ItemDB:rebuildLookupTable()
+function ItemDatabase:rebuildLookupTable()
 	local availableAspects = {}
 	for i = 1, #self.items do
 		for key, val in pairs(self.items[i].aspects) do
@@ -66,7 +57,7 @@ end
 
 ---Initialize item and lookup tables.
 ---@param dbComponent DatabaseComponent
-function itemDatabase.ItemDB:init(dbComponent)
+function ItemDatabase:initialize(dbComponent)
 	assert(dbComponent, "Database component is null")
 	self.dbComponent = dbComponent
 
@@ -74,4 +65,4 @@ function itemDatabase.ItemDB:init(dbComponent)
 	self:rebuildLookupTable()
 end
 
-return itemDatabase
+return ItemDatabase

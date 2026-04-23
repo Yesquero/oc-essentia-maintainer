@@ -1,4 +1,4 @@
-local util = require("oces.utility")
+local util = require("ysq.utility")
 
 local utilityTest = {}
 

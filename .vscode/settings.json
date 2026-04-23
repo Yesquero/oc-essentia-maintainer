@@ -1,10 +1,7 @@
 {
     "lua.debug.settings.luaVersion": "lua53",
-    "lua.debug.settings.path": "${workspaceFolder}/?.lua;${workspaceFolder}/mock/?.lua;${workspaceFolder}/test/?.lua;${workspaceFolder}/src/?.lua",
-    "Lua.workspace.library": [
-        "${workspaceFolder}/src",
-        "${workspaceFolder/mock"
-    ],
+    "lua.debug.settings.path": "${workspaceFolder}/?.lua;${workspaceFolder}/lib/?.lua;${workspaceFolder}/test/?.lua;${workspaceFolder}/src/?.lua;${workspaceFolder}/lib/ysq/?.lua;${workspaceFolder}/lib/oc-mock/?.lua",
+    "Lua.workspace.library": [],
     "[lua]": {
         "editor.defaultFormatter": "JohnnyMorganz.stylua",
         "editor.formatOnSave": true

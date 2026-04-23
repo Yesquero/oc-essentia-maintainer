@@ -3,7 +3,8 @@ local testConstants = {
 	recordsPath = "test/data/oces-records.txt",
 	defaultPollingInterval = 5,
 	defaultPriority = 10,
-	dbDataFile = "data/db_dump.txt",
+	dbDataFile = "resource/data/db_dump.txt",
+	getAspectsDataFile = "resource/data/getAspects.txt",
 }
 
 return testConstants

@@ -1,4 +1,4 @@
-local database = require("mock.database")
+local database = require("oc-mock.database")
 
 ---@class Component
 local component = {

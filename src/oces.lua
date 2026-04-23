@@ -1,3 +1,1 @@
-require("mock.general")
-
-print("test")
+print("oces")

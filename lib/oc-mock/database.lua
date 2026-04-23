@@ -1,4 +1,4 @@
-local mockConstants = require("mock.constants")
+local mockConstants = require("oc-mock.constants")
 local serialization = require("serialization")
 
 ---@class DatabaseComponent
