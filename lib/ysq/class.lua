@@ -7,9 +7,7 @@ Class.__index = Class
 
 ---Default initialization function, called in new, subclasses should override this
 ---@param ... unknown
-function Class:initialize(...)
-	error("not implemented")
-end
+function Class:initialize(...) error("not implemented") end
 
 ---Inherit form this class, supply a table arg to act as a protoype for the new class
 ---@param prototype table?

@@ -22,12 +22,10 @@ function ItemDatabase:initializeItems()
 	assert(self.dbComponent)
 	for i = 1, self.numSlots do
 		local entry = self.dbComponent.get(i)
-		if entry and entry.aspects then
-			self.items[i] = {
-				label = entry.label,
-				aspects = entry.aspects,
-			}
-		end
+		if entry and entry.aspects then self.items[i] = {
+			label = entry.label,
+			aspects = entry.aspects,
+		} end
 	end
 end
 
@@ -51,9 +49,7 @@ function ItemDatabase:rebuildAspectLookup()
 				}
 			end
 		end
-		table.sort(itemsWithAspect, function(lhs, rhs)
-			return lhs.amount > rhs.amount
-		end)
+		table.sort(itemsWithAspect, function(lhs, rhs) return lhs.amount > rhs.amount end)
 		self.aspectLookup[key] = itemsWithAspect
 	end
 end

@@ -130,26 +130,18 @@ function serialization.serialize(value, pretty)
 			truncate = string.find(result, "\n", truncate + 1, true)
 			limit = limit - 1
 		end
-		if truncate then
-			return result:sub(1, truncate) .. "..."
-		end
+		if truncate then return result:sub(1, truncate) .. "..." end
 	end
 	return result
 end
 
 function serialization.unserialize(data)
-	if not type(data) == "string" then
-		error("Bad argument #1")
-	end
+	if not type(data) == "string" then error("Bad argument #1") end
 	---@diagnostic disable-next-line: undefined-global
 	local result, reason = load("return " .. data, "=data", _, { math = { huge = math.huge } })
-	if not result then
-		return nil, reason
-	end
+	if not result then return nil, reason end
 	local ok, output = pcall(result)
-	if not ok then
-		return nil, output
-	end
+	if not ok then return nil, output end
 	return output
 end
 

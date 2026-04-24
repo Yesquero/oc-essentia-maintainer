@@ -13,9 +13,7 @@ local database = {
 ---Get the representation of the item stack stored in the specified slot.
 ---@param slot number
 ---@return DBItemStack
-function database.get(slot)
-	return database.dummyData[slot]
-end
+function database.get(slot) return database.dummyData[slot] end
 
 -- TODO: make function package private
 local function loadData()

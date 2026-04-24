@@ -6,6 +6,7 @@ local constants = {
 	defaultPriority = 0,
 	defaultPollingInterval = 10,
 	databaseSlots = 81,
+	smelteryitemSlot = 1,
 }
 
 local SmelterType = {

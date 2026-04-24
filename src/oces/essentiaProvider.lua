@@ -14,8 +14,9 @@ EssentiaProvider.itemSources = {}
 EssentiaProvider.ItemDB = nil
 EssentiaProvider.configPath = nil
 
----Given a dict of missing aspects finds slot number of ItemStack with ratio of aspects closest to that of missing aspects.
+---Given a dict of missing aspects finds slot number of ItemStack with percentage ratio of aspects closest to that of missing aspects.
 ---Return nil if no ItemStack found.
+---TODO: Explore ways to improve ItemStack finding algo.
 ---@param missingAspects { [string]: integer }
 ---@retrun integer
 function EssentiaProvider:findItemStackToSmelt(missingAspects)

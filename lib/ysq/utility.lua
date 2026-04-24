@@ -5,31 +5,19 @@ local utility = {}
 ---@param right table
 ---@return boolean
 function utility.compareTables(left, right)
-	if left == nil and right == nil then
-		return true
-	end
-	if left == nil or right == nil then
-		return false
-	end
+	if left == nil and right == nil then return true end
+	if left == nil or right == nil then return false end
 
-	if type(left) ~= type(right) then
-		return false
-	end
+	if type(left) ~= type(right) then return false end
 
-	if type(left) ~= "table" then
-		return left == right
-	end
+	if type(left) ~= "table" then return left == right end
 
 	for k, v in pairs(left) do
-		if not utility.compareTables(right[k], v) then
-			return false
-		end
+		if not utility.compareTables(right[k], v) then return false end
 	end
 
 	for k, v in pairs(right) do
-		if not utility.compareTables(left[k], v) then
-			return false
-		end
+		if not utility.compareTables(left[k], v) then return false end
 	end
 
 	return true
@@ -43,9 +31,7 @@ end
 ---@param cmp fun(any): boolean
 ---@return boolean
 function utility.arrayRemove(array, cmp)
-	if #array == 0 then
-		return false
-	end
+	if #array == 0 then return false end
 
 	local j, len = 1, #array
 	for i = 1, len do
@@ -69,9 +55,7 @@ end
 function utility.clearFile(filename, isSerializationTarget)
 	local file = assert(io.open(filename, "w"))
 	local isSerializationTarget = isSerializationTarget or false
-	if isSerializationTarget then
-		file:write("{}")
-	end
+	if isSerializationTarget then file:write("{}") end
 	file:close()
 end
 

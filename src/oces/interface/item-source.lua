@@ -11,9 +11,7 @@ IItemSource.ItemDB = nil
 
 ---Check is smelter associated with this item source is available.
 ---@return boolean
-function IItemSource:isSmelterAvailable()
-	error("not implemented")
-end
+function IItemSource:isSmelterAvailable() error("not implemented") end
 
 ---Attempts to insert specified amount of items matching the ItemStack in dbSlot into attached item smelter.
 ---Note that if smelter efficiency is not 100% then more or less items will be inserted, depending on exact efficiency.
@@ -21,15 +19,13 @@ end
 ---@param amount integer
 ---@return boolean
 ---@return string?
-function IItemSource:smeltItems(dbSlot, amount)
-	error("not implemented")
-end
+function IItemSource:smeltItems(dbSlot, amount) error("not implemented") end
 
 ---Attempts to find an ItemStack with maximum amount of specified aspect.
 ---@param name string
+---@param maxResults integer?
 ---@return table
-function IItemSource:findBestAspectSource(name)
-	error("not implemented")
-end
+---@retrun msg?
+function IItemSource:findAspectSource(name, maxResults) error("not implemented") end
 
 return IItemSource
