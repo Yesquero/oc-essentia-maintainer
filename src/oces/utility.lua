@@ -2,15 +2,15 @@ local utility = {}
 
 ---@param dict {[string]: integer}
 ---@return {[string]: number}
-function utility.valToRatioDict(dict)
+function utility.valToPercentDict(dict)
 	local ratioDict = {}
-	local min = math.maxinteger
+	local sum = 0
 	for k, v in pairs(dict) do
-		min = math.min(min, v)
+		sum = sum + v
 	end
 
 	for k, v in pairs(dict) do
-		ratioDict[k] = v / min
+		ratioDict[k] = v / sum * 100
 	end
 
 	return ratioDict

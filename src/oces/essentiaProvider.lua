@@ -23,7 +23,7 @@ function EssentiaProvider:findItemStackToSmelt(missingAspects)
 	local dbSlot = nil
 	local ratioDifference = math.maxinteger
 
-	local missingAspecRatio = ocesUtil.valToRatioDict(missingAspects)
+	local missingAspecRatio = ocesUtil.valToPercentDict(missingAspects)
 
 	for index, ratioDict in pairs(self.ItemDB.aspectRatioLookup) do
 		local newDifference = 0

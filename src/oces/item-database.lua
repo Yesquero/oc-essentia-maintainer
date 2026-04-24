@@ -60,7 +60,7 @@ end
 
 function ItemDatabase:rebuildRatioLookup()
 	for i = 1, #self.items do
-		self.aspectRatioLookup[i] = ocesUtil.valToRatioDict(self.items[i].aspects)
+		self.aspectRatioLookup[i] = ocesUtil.valToPercentDict(self.items[i].aspects)
 	end
 end
 

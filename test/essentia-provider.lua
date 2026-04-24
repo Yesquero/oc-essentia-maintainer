@@ -33,10 +33,24 @@ function essentiaProviderTest.integrationTest()
 
 	missingAspects = {
 		Vitreus = 50,
-		Ignis = 550,
-		Potentia = 450,
+		Ignis = 525,
+		Potentia = 425,
 	}
 	assert(ep:findItemStackToSmelt(missingAspects) == 9)
+
+	missingAspects = {
+		Vitreus = 50,
+		Terra = 250,
+		Perditio = 250,
+	}
+	assert(ep:findItemStackToSmelt(missingAspects) == 5)
+
+	missingAspects = {
+		Cognitio = 1000,
+		Terra = 250,
+		Perditio = 250,
+	}
+	assert(ep:findItemStackToSmelt(missingAspects) == 8)
 
 	print("essentiaProviderTest.integrationTest complete")
 end
