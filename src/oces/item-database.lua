@@ -1,17 +1,20 @@
 local Class = require("ysq.class")
 local constants = require("oces.constants")
+local ocesUtil = require("oces.utility")
 
 ---@class ItemDB: AbstractClass
 ---@field new fun(self: ItemDB, dbComponent: table): ItemDB
 ---@field dbComponent DatabaseComponent
 ---@field items { label: string, aspects: Aspects[] }[]
 ---@field aspectLookup { [string]: { slot: integer, amount: integer }[]}
+---@field aspectRatioLookup { [integer]: Aspects}
 ---@field numSlots integer
 local ItemDatabase = Class:inherit({
 	dbComponent = nil,
 	items = {},
 	aspectLookup = {},
 	numSlots = constants.databaseSlots,
+	aspectRatioLookup = {},
 })
 
 ---Initializes list of available items
@@ -29,7 +32,7 @@ function ItemDatabase:initializeItems()
 end
 
 ---Rebuild aspect lookup table
-function ItemDatabase:rebuildLookupTable()
+function ItemDatabase:rebuildAspectLookup()
 	local availableAspects = {}
 	for i = 1, #self.items do
 		for key, val in pairs(self.items[i].aspects) do
@@ -55,6 +58,12 @@ function ItemDatabase:rebuildLookupTable()
 	end
 end
 
+function ItemDatabase:rebuildRatioLookup()
+	for i = 1, #self.items do
+		self.aspectRatioLookup[i] = ocesUtil.valToRatioDict(self.items[i].aspects)
+	end
+end
+
 ---Initialize item and lookup tables.
 ---@param dbComponent DatabaseComponent
 function ItemDatabase:initialize(dbComponent)
@@ -62,7 +71,8 @@ function ItemDatabase:initialize(dbComponent)
 	self.dbComponent = dbComponent
 
 	self:initializeItems()
-	self:rebuildLookupTable()
+	self:rebuildAspectLookup()
+	self:rebuildRatioLookup()
 end
 
 return ItemDatabase

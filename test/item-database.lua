@@ -1,25 +1,14 @@
 local ItemDatabase = require("oces.item-database")
 local component = require("component")
+local testConstants = require("test.constants")
 local util = require("ysq.utility")
-local itemDBTest = {}
 
-local expectedItems = {
-	{ label = "Clear Glass", aspects = { Vitreus = 5 } },
-	{ label = "Blitz Rod", aspects = { Aer = 15, Alkimia = 5 } },
-	{ label = "Blaze Rod", aspects = { Potentia = 5, Ignis = 15 } },
-	{ label = "Lead Ingot", aspects = { Ordo = 5, Metallum = 10 } },
-	{ label = "Sand", aspects = { Perditio = 5, Terra = 5 } },
-	{ label = "Vishroom", aspects = { Mortuus = 1, Herba = 2, Vitium = 8, Praecantatio = 1, Perditio = 1 } },
-	{ label = "Stone Gear", aspects = { Machina = 5 } },
-	{ label = "Oak Bookshelf", aspects = { Cognitio = 8 } },
-	{ label = "Coal", aspects = { Potentia = 10, Ignis = 10 } },
-	{ label = "Bone", aspects = { Mortuus = 5, Victus = 5 } },
-}
+local itemDBTest = {}
 
 function itemDBTest.unitTest()
 	local itemDB = ItemDatabase:new(component.database)
 
-	assert(util.compareTables(itemDB.items, expectedItems))
+	assert(util.compareTables(itemDB.items, testConstants.expectedDBItems))
 	assert(util.compareTables(itemDB.aspectLookup["Ignis"], {
 		{ slot = 3, amount = 15 },
 		{ slot = 9, amount = 10 },
@@ -34,6 +23,18 @@ function itemDBTest.unitTest()
 	assert(util.compareTables(itemDB.aspectLookup["Mortuus"], {
 		{ slot = 10, amount = 5 },
 		{ slot = 6, amount = 1 },
+	}))
+	assert(util.compareTables(itemDB.aspectRatioLookup[2], {
+		Aer = 3,
+		Alkimia = 1,
+	}))
+	assert(util.compareTables(itemDB.aspectRatioLookup[9], {
+		Potentia = 1,
+		Ignis = 1,
+	}))
+	assert(util.compareTables(itemDB.aspectRatioLookup[4], {
+		Ordo = 1,
+		Metallum = 2,
 	}))
 
 	print("itemDBTest.unitTest complete")
