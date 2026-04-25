@@ -11,13 +11,13 @@ local config = {
 	recordsPath = constants.defaultRecordsPath,
 }
 
----@class Maintainer: AbstractClass
+---@class EssentiaMaintainer: AbstractClass
 ---@field aspectList {name: string, amount: integer, priority: integer}[]
 ---@field aspectLookup { [string]: integer }
 ---@field configPath string
 ---@field config MaintainerConfig
 ---@field essentiaStorage IEssentiaStorage
----@field new fun(self, configPath: string, essentiaStorage: IEssentiaStorage): Maintainer
+---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit({
 	aspectList = {},
 	aspectLookup = {},
@@ -31,7 +31,7 @@ local EssentiaMaintainer = Class:inherit({
 ---TODO: sanity check values
 ---@return boolean
 function EssentiaMaintainer:readConfig()
-	local file = assert(io.open(self.configPath, "r"), "Could not open config file.")
+	local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
 	self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
 	file:close()
 
@@ -85,13 +85,9 @@ function EssentiaMaintainer:deleteAspect(name)
 	assert(name and type(name) == "string", "deleteAspect invalid argument(s)")
 
 	self:readRecords()
-	if #self.aspectList == 0 then
-		return true
-	end
+	if #self.aspectList == 0 then return true end
 
-	local res = util.arrayRemove(self.aspectList, function(val)
-		return val.name == name
-	end)
+	local res = util.arrayRemove(self.aspectList, function(val) return val.name == name end)
 	if res then
 		self:saveRecords()
 		return true
@@ -102,9 +98,7 @@ end
 
 ---Uses OC serialization pretty print to visualize currently maintained aspects.
 ---@return string
-function EssentiaMaintainer:showAspectList()
-	return serialization.serialize(self.aspectList, true)
-end
+function EssentiaMaintainer:showAspectList() return serialization.serialize(self.aspectList, true) end
 
 ---Save current list of maintained aspect to a file.
 ---@return boolean
@@ -121,9 +115,7 @@ end
 function EssentiaMaintainer:rebuildLookup()
 	self.aspectLookup = {}
 
-	local sortByPriority = function(left, right)
-		return left.priority > right.priority
-	end
+	local sortByPriority = function(left, right) return left.priority > right.priority end
 	table.sort(self.aspectList, sortByPriority)
 
 	for i = 1, #self.aspectList do
@@ -132,9 +124,10 @@ function EssentiaMaintainer:rebuildLookup()
 end
 
 ---TODO check args ?
-function EssentiaMaintainer:initialize(configPath, essentiaStorage)
-	self.configPath = configPath
+function EssentiaMaintainer:initialize(essentiaStorage, configPath)
+	self.configPath = configPath or constants.defaultCfgPath
 	self.essentiaStorage = essentiaStorage
+	self:readConfig()
 end
 
 ---Returns a dict of missing aspects.
@@ -145,9 +138,7 @@ function EssentiaMaintainer:getMissingAspects()
 
 	for key, val in pairs(self.aspectLookup) do
 		local amount = val - (availableAspects[key] or 0)
-		if amount > 0 then
-			missingAspect[key] = amount
-		end
+		if amount > 0 then missingAspect[key] = amount end
 	end
 
 	return missingAspect

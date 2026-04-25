@@ -7,7 +7,7 @@ local maintainerTest = {}
 
 function maintainerTest.unitTest()
 	---@diagnostic disable-next-line:param-type-mismatch
-	local maintainer = EssentiaMaintainer:new(testConstants.cfgPath, nil)
+	local maintainer = EssentiaMaintainer:new(nil, "resource/data/oces.cfg")
 
 	assert(util.compareTables(maintainer.config, {
 		defaultPriority = constants.defaultPriority,
@@ -15,7 +15,8 @@ function maintainerTest.unitTest()
 		recordsPath = constants.defaultRecordsPath,
 	}))
 
-	maintainer:readConfig()
+	---@diagnostic disable-next-line:param-type-mismatch
+	maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
 	assert(util.compareTables(maintainer.config, {
 		defaultPriority = testConstants.defaultPriority,
 		pollingInterval = testConstants.defaultPollingInterval,

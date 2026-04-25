@@ -5,6 +5,7 @@ local serialization = require("serialization")
 local database = {
 	type = "database",
 	dummyData = {},
+	address = "ab142877-2995-479c-b1e6-363146c898d0",
 }
 
 ---@alias Aspects { [string]: integer }
@@ -13,9 +14,7 @@ local database = {
 ---Get the representation of the item stack stored in the specified slot.
 ---@param slot number
 ---@return DBItemStack
-function database.get(slot)
-	return database.dummyData[slot]
-end
+function database.get(slot) return database.dummyData[slot] end
 
 -- TODO: make function package private
 local function loadData()

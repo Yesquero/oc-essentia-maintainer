@@ -9,13 +9,9 @@ local MockEssentiaStorage = IEssentiaStorage:inherit({
 	dummyData = {},
 })
 
-function MockEssentiaStorage:getAspect(name)
-	return self.dummyData[name]
-end
+function MockEssentiaStorage:getAspect(name) return self.dummyData[name] end
 
-function MockEssentiaStorage:getAspects()
-	return self.dummyData
-end
+function MockEssentiaStorage:getAspects() return self.dummyData end
 
 function MockEssentiaStorage:initialize()
 	local file = assert(io.open(constants.getAspectsDataFile), "Could not open mock getAspect file.")
