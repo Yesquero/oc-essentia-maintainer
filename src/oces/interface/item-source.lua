@@ -4,10 +4,9 @@ local constants = require("oces.constants")
 ---@class IItemSource: AbstractClass
 local IItemSource = Class:inherit()
 
-IItemSource.efficiency = 1
-IItemSource.smelterType = constants.SmelterType.Default
 ---@type ItemDB
 IItemSource.ItemDB = nil
+IItemSource.type = constants.ItemSourceType.Default
 
 ---Check is smelter associated with this item source is available.
 ---@return boolean
@@ -17,7 +16,7 @@ function IItemSource:isSmelterAvailable() error("not implemented") end
 ---Note that if smelter efficiency is not 100% then more or less items will be inserted, depending on exact efficiency.
 ---@param dbSlot integer
 ---@param amount integer
----@return boolean
+---@return integer | nil
 ---@return string?
 function IItemSource:smeltItems(dbSlot, amount) error("not implemented") end
 

@@ -5,6 +5,7 @@ local serialization = require("serialization")
 local database = {
 	type = "database",
 	dummyData = {},
+	address = "ab142877-2995-479c-b1e6-363146c898d0",
 }
 
 ---@alias Aspects { [string]: integer }

@@ -1,12 +1,20 @@
 ---@class MEEBus
 local me_export_bus = {}
+me_export_bus.exportSize = 64
+me_export_bus.validSide = 4
 
 ---Get the configuration of the export bus pointing in the specified direction.
 ---@param side number
 ---@param slot number?
----@return table
+---@return table | nil
 ---@return string?
-function me_export_bus.getExportConfiguration(side, slot) error("not implemented") end
+function me_export_bus.getExportConfiguration(side, slot)
+	if side == me_export_bus.validSide then
+		return nil
+	else
+		return nil, "no matching part"
+	end
+end
 
 ---Configure the export bus pointing in the specified direction to export item stacks matching the specified descriptor.
 ---When called with side only clear the config.
@@ -14,13 +22,27 @@ function me_export_bus.getExportConfiguration(side, slot) error("not implemented
 ---@param slot number?
 ---@param database table?
 ---@param entry number?
----@return boolean
-function me_export_bus.setExportConfiguration(side, slot, database, entry) error("not implemented") end
+---@return boolean | nil
+---@return string?
+function me_export_bus.setExportConfiguration(side, slot, database, entry)
+	if side == me_export_bus.validSide then
+		return true
+	else
+		return nil
+	end
+end
 
 ---Make the export bus facing the specified direction perform a single export operation into the specified slot.
 ---@param side number
 ---@param slot number?
----@return integer
-function me_export_bus.exportIntoSlot(side, slot) error("not implemented") end
+---@return integer | nil
+---@return string?
+function me_export_bus.exportIntoSlot(side, slot)
+	if side == me_export_bus.validSide then
+		return me_export_bus.exportSize
+	else
+		return nil
+	end
+end
 
 return me_export_bus

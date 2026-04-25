@@ -10,15 +10,21 @@ local constants = {
 }
 
 local SmelterType = {
-	Default = 1,
-	EssentiaSmeltry = 2,
-	AdvancedAlchemicalConstruct = 3,
+	Default = "Default",
+	EssentiaSmeltery = "EssentiaSmeltery",
+	AdvancedAlchemicalConstruct = "AdvancedAlchemicalConstruct",
 }
+setmetatable(SmelterType, {
+	__index = function(table, index) error("Invalid SmelterType") end,
+})
 
 local ItemSourceType = {
-	Default = 1,
-	ExportBus = 2,
+	Default = "Default",
+	ExportBus = "ExportBus",
 }
+setmetatable(ItemSourceType, {
+	__index = function(table, index) error("Invalid ItemSourceType") end,
+})
 
 constants.SmelterType = SmelterType
 constants.ItemSourceType = ItemSourceType

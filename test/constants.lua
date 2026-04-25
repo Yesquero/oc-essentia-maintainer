@@ -5,7 +5,21 @@ local testConstants = {
 	defaultPriority = 10,
 	dbDataFile = "resource/data/db_dump.txt",
 	getAspectsDataFile = "resource/data/getAspects.txt",
+	epConfigPath = "test/data/oces-ep.cfg",
+	databaseID = "ab142877-2995-479c-b1e6-363146c898d0",
+	validExportSide = 4,
 }
+
+local EPConfig = {
+	efficiency = 0.8,
+	accelerationCards = 3,
+	sourceType = "ExportBus",
+	smelterType = "EssentiaSmeltery",
+	smelterAdapterID = "e0eab32d-41e8-4a1a-aafd-c8bf15117ffd",
+	sourceAdapterID = "4f177b1e-a237-4cf7-b353-c63fd363a1e0",
+	interfaceAdaptedID = "7363a082-6765-45f4-8a48-a5d57692a581",
+}
+testConstants.epConfig = EPConfig
 
 testConstants.expectedDBItems = {
 	{ label = "Clear Glass", aspects = { Vitreus = 5 } },

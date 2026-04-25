@@ -71,4 +71,8 @@ function ItemDatabase:initialize(dbComponent)
 	self:rebuildRatioLookup()
 end
 
+---Get underlying Database component.
+---@return DatabaseComponent
+function ItemDatabase:getComponent() return self.dbComponent end
+
 return ItemDatabase
