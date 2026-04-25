@@ -8,3 +8,4 @@
 {oreNames={"bookshelfOak","bookshelf"},size=1,name="minecraft:bookshelf",id=47,damage=0,maxSize=64,label="Oak Bookshelf",aspects={Cognitio=8},hasTag=false,maxDamage=0}
 {oreNames={"gemCoal","coal","itemCoal"},size=1,name="minecraft:coal",id=263,damage=0,maxSize=64,label="Coal",aspects={Potentia=10,Ignis=10},hasTag=false,maxDamage=0}
 {oreNames={"bone"},size=1,name="minecraft:bone",id=352,damage=0,maxSize=64,label="Bone",aspects={Mortuus=5,Victus=5},hasTag=false,maxDamage=0}
+{oreNames={},size=1,name="minecraft:sunflower",id=354,damage=0,maxSize=64,label="Sunflower",aspects={Herba=5,Sensus=5,Aer=1,Victus=1},hasTag=false,maxDamage=0}

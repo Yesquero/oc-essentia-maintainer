@@ -73,6 +73,17 @@ local function testFindItemStack(ep)
     }
     assert(ep:findItemStackToSmelt(missingAspects) == 2)
 
+    -- missingAspects = {
+    --     Vitium = 800,
+    --     Ordo = 450,
+    --     Terra = 490,
+    --     Perditio = 500,
+    --     Aqua = 500,
+    --     Ignis = 500,
+    --     Aer = 500,
+    -- }
+    -- assert(ep:findItemStackToSmelt(missingAspects) == 2)
+
     print("essentiaProvider.testFindItemStack complete")
 end
 

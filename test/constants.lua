@@ -32,6 +32,7 @@ testConstants.expectedDBItems = {
     { label = "Oak Bookshelf", aspects = { Cognitio = 8 } },
     { label = "Coal", aspects = { Potentia = 10, Ignis = 10 } },
     { label = "Bone", aspects = { Mortuus = 5, Victus = 5 } },
+    { label = "Sunflower", aspects = { Herba = 5, Sensus = 5, Aer = 1, Victus = 1 } },
 }
 
 return testConstants
