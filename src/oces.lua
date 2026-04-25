@@ -58,24 +58,19 @@ local function maintainerLoop(Maintainer, Provider)
 
         local missingAspects = Maintainer:getMissingAspects()
 
-        --TODO: show updated aspect values via showAspectList()
         local res, time, msg = Provider:refillAspects(missingAspects)
         if res then
-            print(string.format("Refilling aspects: %s;", msg))
-            local col, row, start = 0, 0, computer.uptime()
+            local start = computer.uptime()
             while time > computer.uptime() - start do
-                if col > 0 and row > 0 then
-                    term.setCursor(col, row - 1)
-                    term.clearLine()
-                end
-
+                term.clear()
+                print(Maintainer:showAspectList())
+                print(string.format("Refilling aspects: %s;", msg))
                 print(
                     string.format(
-                        "Waiting for smelter to finish... ~%d sec",
+                        "Waiting for smelter to finish... ~%i sec",
                         math.ceil(time - computer.uptime() + start)
                     )
                 )
-                col, row = term.getCursor()
 
                 os.sleep(3)
             end
