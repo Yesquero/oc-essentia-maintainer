@@ -1,22 +1,15 @@
 local filesystem = {}
 
-local constants = require("oces.constants")
-local testConstants = require("test.constants")
-
-local validPaths = {
-    constants.defaultCfgPath,
-    testConstants.cfgPath,
-    constants.defaultEPConfigPath,
-    testConstants.epConfigPath,
-}
-
 ---Retrun true if specified path exists, false otherwise.
 ---@param path string
 function filesystem.exists(path)
-    for k, v in ipairs(validPaths) do
-        if path == v then return true end
+    local file = io.open(path, "r")
+    if file then
+        file:close()
+        return true
+    else
+        return false
     end
-    return false
 end
 
 return filesystem

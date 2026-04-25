@@ -20,12 +20,14 @@ function maintainerTest.testInit()
     local maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
     assert(#maintainer.aspectList ~= 0)
 
-    util.clearFile(testConstants.recordsPath, true)
+    os.remove(testConstants.recordsPath)
 
     print("maintainerTest.testInit complete")
 end
 
 function maintainerTest.unitTest()
+    os.remove(testConstants.recordsPath)
+
     ---@diagnostic disable-next-line:param-type-mismatch
     local maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
     assert(util.compareTables(maintainer.config, {
@@ -65,7 +67,7 @@ function maintainerTest.unitTest()
 end
 
 function maintainerTest.integrationTest()
-    util.clearFile(testConstants.recordsPath, true)
+    os.remove(testConstants.recordsPath)
 
     local MockES = MockEssentiaStorage:new()
     local maintainer = EssentiaMaintainer:new(MockES, testConstants.cfgPath)
@@ -88,7 +90,8 @@ function maintainerTest.integrationTest()
 end
 
 function maintainerTest.showTest()
-    util.clearFile(testConstants.recordsPath, true)
+    os.remove(testConstants.recordsPath)
+
     local MockES = MockEssentiaStorage:new()
     local maintainer = EssentiaMaintainer:new(MockES, testConstants.cfgPath)
 
@@ -100,6 +103,8 @@ function maintainerTest.showTest()
     maintainer:addAspect("Sonus", 1)
     maintainer:addAspect("Aer", 700)
     print(maintainer:showAspectList())
+
+    os.remove(testConstants.recordsPath)
 end
 
 return maintainerTest
