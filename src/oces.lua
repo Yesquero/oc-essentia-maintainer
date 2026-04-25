@@ -1,4 +1,5 @@
 local component = require("component")
+local computer = require("computer")
 local shell = require("shell")
 local term = require("term")
 
@@ -60,8 +61,20 @@ local function maintainerLoop(Maintainer, Provider)
         --TODO: better communicate to user that we are waiting for smelter
         local res, time, msg = Provider:refillAspects(missingAspects)
         if res then
-            print(string.format("Refilling aspects: %s;\nWaiting for smelter to finish... (%i)", msg, time))
-            os.sleep(time)
+            print(string.format("Refilling aspects: %s;"), msg)
+            local col, row, start = 0, 0, computer.uptime()
+            while time > 0 do
+                if col > 0 and row > 0 then
+                    term.setCursor(col, row - 1)
+                    term.clearLine()
+                end
+
+                print(string.format("Waiting for smelter to finish... ~%i sec", time))
+                col, row = term.getCursor()
+
+                os.sleep(3)
+                time = time - (computer.uptime() - start)
+            end
         else
             print("Unable to refill aspects: " .. msg)
             os.sleep(Maintainer.config.pollingInterval)
