@@ -11,7 +11,9 @@ local function runTests()
 
 	utilityTest.testArrayRemove()
 
+	maintainerTest.testInit()
 	maintainerTest.unitTest()
+	maintainerTest.integrationTest()
 
 	itemDBTest.unitTest()
 

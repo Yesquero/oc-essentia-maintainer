@@ -1,6 +1,6 @@
 ---@class MEEBus
 local me_export_bus = {}
-me_export_bus.exportSize = 64
+me_export_bus.exportSize = 32
 me_export_bus.validSide = 4
 
 ---Get the configuration of the export bus pointing in the specified direction.

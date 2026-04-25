@@ -1,5 +1,8 @@
+local EssentiaMaintainer = require("oces.maintainer")
 local EssentiaProvider = require("oces.essentia-provider")
 local ItemDatabase = require("oces.item-database")
+local MockEssentiaStorage = require("test.mock-essentia-storage")
+local util = require("ysq.utility")
 
 local testConstants = require("test.constants")
 
@@ -64,6 +67,12 @@ local function testFindItemStack(ep)
 	}
 	assert(ep:findItemStackToSmelt(missingAspects) == 8)
 
+	missingAspects = {
+		Aer = 100,
+		Sonus = 100,
+	}
+	assert(ep:findItemStackToSmelt(missingAspects) == 2)
+
 	print("essentiaProvider.testFindItemStack complete")
 end
 
@@ -71,12 +80,14 @@ end
 local function testFindAspectSource(ep)
 	assert(ep:findAspectSource("Invalid", 1) == nil)
 	assert(ep:findAspectSource("Vitium", 1)[1].label == "Vishroom")
+	local res, msg = ep:findAspectSource("Ordo", 10)
 
 	print("essentiaProvider.testFindAspectSource complete")
 end
 
 ---@param ep EssentiaProvider
-local function testRefillAspects(ep)
+---@param em EssentiaMaintainer
+local function testRefillAspects(ep, em)
 	local missingAspects = {
 		InvalidAspect = -1,
 	}
@@ -97,10 +108,26 @@ local function testRefillAspects(ep)
 	res, msg = ep:refillAspects(missingAspects)
 	assert(res == true and msg == "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted.")
 
+	missingAspects = {
+		Aer = 1000,
+		Ignis = 250,
+		Potentia = 250,
+		Sonus = 100,
+	}
+	res, msg = ep:refillAspects(missingAspects)
+	assert(res == true and msg == "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted.")
+
+	em:addAspect("Machina", 231)
+	em:addAspect("Metallum", 10)
+	res, msg = ep:refillAspects(em:getMissingAspects())
+	assert(res == true and msg == "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted.")
+
 	print("essentiaProvider.testRefillAspects complete")
 end
 
 function essentiaProviderTest.integrationTest()
+	util.clearFile(testConstants.recordsPath, true)
+
 	local itemDB = ItemDatabase:new(component.database)
 
 	---@type EssentiaProvider
@@ -118,7 +145,11 @@ function essentiaProviderTest.integrationTest()
 
 	testFindItemStack(ep)
 	testFindAspectSource(ep)
-	testRefillAspects(ep)
+
+	local MockEs = MockEssentiaStorage:new()
+	local Maintainer = EssentiaMaintainer:new(MockEs, testConstants.cfgPath)
+
+	testRefillAspects(ep, Maintainer)
 
 	print("essentiaProviderTest.integrationTest complete")
 end

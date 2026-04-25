@@ -44,11 +44,13 @@ end
 local function showAspects(Maintainer) print(Maintainer:showAspectList()) end
 
 ---@param Provider EssentiaProvider
+---@param name string
+---@param maxResults integer
 local function findAspectSource(Provider, name, maxResults)
-	local res, msg = Provider:findAspectSource(name, maxResults or 0)
+	local res, msg = Provider:findAspectSource(name, maxResults or 1)
 	if res then
 		for ind, val in ipairs(res) do
-			print(string.format("%s: %i %s", val.label, val.aspects[name]), name)
+			print(string.format("%s: %i %s", val.label, val.aspects[name], name))
 		end
 	else
 		print(msg)
@@ -58,19 +60,21 @@ end
 ---@param Maintainer EssentiaMaintainer
 ---@param Provider EssentiaProvider
 local function maintainerLoop(Maintainer, Provider)
-	term.clear()
-	print(Maintainer:showAspectList())
+	while true do
+		term.clear()
+		print(Maintainer:showAspectList())
 
-	local missingAspects = Maintainer:getMissingAspects()
+		local missingAspects = Maintainer:getMissingAspects()
 
-	local res, msg = Provider:refillAspects(missingAspects)
-	if res then
-		print("Refilling aspects: " .. msg)
-	else
-		print("Unable to refill aspects: " .. msg)
+		local res, msg = Provider:refillAspects(missingAspects)
+		if res then
+			print("Refilling aspects: " .. msg)
+		else
+			print("Unable to refill aspects: " .. msg)
+		end
+
+		os.sleep(Maintainer.config.pollingInterval)
 	end
-
-	os.sleep(Maintainer.config.pollingInterval)
 end
 
 local function showHelp()
@@ -78,12 +82,12 @@ local function showHelp()
 	oces version %s 
 	Usage: oces [key] arg...
 	Keys:
-	--add <string> <integer>	Add Aspect to the list of maintained aspects.
-	--delete <string>			Delete Aspect from the list of maintained aspects.
-	--show						Show list of maintained aspects.
-	--find <string> <integer>	Find all items with the specified aspect, sorted by its amount. Second arg is max number of results.
-	--start						Start maintaining aspects, runs in foreground.
-	--help						Show usage.
+	--add <string> <integer>    Add Aspect to the list of maintained aspects.
+	--delete <string>           Delete Aspect from the list of maintained aspects.
+	--show                      Show list of maintained aspects.
+	--find <string> <integer>   Find all items with the specified aspect, sorted by its amount. Second arg is max number of results.
+	--start                     Start maintaining aspects, runs in foreground.
+	--help                      Show usage.
 	]]
 
 	print(string.format(usage, constants.version))
@@ -95,13 +99,17 @@ end
 ---@param Provider EssentiaProvider
 local function chooseFunction(args, ops, Maintainer, Provider)
 	if ops.add then
-		addAspect(Maintainer, args[1], args[2])
+		local amount = tonumber(args[2])
+		if not amount then error("Invalid `add` argument: " .. args[2]) end
+		addAspect(Maintainer, args[1], amount)
 	elseif ops.delete then
 		deleteAspect(Maintainer, args[1])
 	elseif ops.show then
 		showAspects(Maintainer)
 	elseif ops.find then
-		findAspectSource(Provider, args[1], args[2])
+		local maxRes = tonumber(args[2])
+		if not maxRes then error("Invalid `find` argument: " .. args[2]) end
+		findAspectSource(Provider, args[1], maxRes)
 	elseif ops.start then
 		maintainerLoop(Maintainer, Provider)
 	elseif ops.help then
@@ -111,18 +119,17 @@ local function chooseFunction(args, ops, Maintainer, Provider)
 	end
 end
 
-local function main()
+local function main(...)
 	local initRes, EssentiaStorage, ItemDB, Maintainer, Provider = pcall(init)
 	if not initRes then
 		print("Something went wrong: " .. EssentiaStorage)
 		return
 	end
 
-	---@diagnostic disable-next-line:unexpect-dots
 	local args, ops = shell.parse(...)
 
 	local res, msg = pcall(chooseFunction, args, ops, Maintainer, Provider)
 	if not res then print("Something went wrong: " .. msg) end
 end
 
-main()
+main(...)

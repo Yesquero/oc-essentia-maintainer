@@ -1,22 +1,33 @@
 local EssentiaMaintainer = require("oces.maintainer")
+local MockEssentiaStorage = require("test.mock-essentia-storage")
 local constants = require("oces.constants")
+local serialization = require("serialization")
 local testConstants = require("test.constants")
 local util = require("ysq.utility")
 
 local maintainerTest = {}
 
+local function setupRecords()
+	local file = assert(io.open(testConstants.recordsPath, "w"))
+	assert(file:write(serialization.serialize({ { name = "Ignis", amount = 100, priority = 0 } })))
+	file:close()
+end
+
+function maintainerTest.testInit()
+	setupRecords()
+
+	---@diagnostic disable-next-line:param-type-mismatch
+	local maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
+	assert(#maintainer.aspectList ~= 0)
+
+	util.clearFile(testConstants.recordsPath, true)
+
+	print("maintainerTest.testInit complete")
+end
+
 function maintainerTest.unitTest()
 	---@diagnostic disable-next-line:param-type-mismatch
-	local maintainer = EssentiaMaintainer:new(nil, "resource/data/oces.cfg")
-
-	assert(util.compareTables(maintainer.config, {
-		defaultPriority = constants.defaultPriority,
-		pollingInterval = constants.defaultPollingInterval,
-		recordsPath = constants.defaultRecordsPath,
-	}))
-
-	---@diagnostic disable-next-line:param-type-mismatch
-	maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
+	local maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
 	assert(util.compareTables(maintainer.config, {
 		defaultPriority = testConstants.defaultPriority,
 		pollingInterval = testConstants.defaultPollingInterval,
@@ -51,6 +62,29 @@ function maintainerTest.unitTest()
 	assert(maintainer.aspectList[1].name == "Metallum")
 
 	print("maintainerTest.unitTest complete")
+end
+
+function maintainerTest.integrationTest()
+	util.clearFile(testConstants.recordsPath, true)
+
+	local MockES = MockEssentiaStorage:new()
+	local maintainer = EssentiaMaintainer:new(MockES, testConstants.cfgPath)
+
+	assert(util.compareTables(maintainer:getMissingAspects(), {}))
+
+	maintainer:addAspect("Vitium", 100)
+	assert(util.compareTables(maintainer:getMissingAspects(), {
+		Vitium = 81,
+	}))
+
+	maintainer:addAspect("Metallum", 991)
+	maintainer:addAspect("Potentia", 10)
+	assert(util.compareTables(maintainer:getMissingAspects(), {
+		Vitium = 81,
+		Metallum = 991,
+	}))
+
+	print("maintainerTest.integrationTest complete")
 end
 
 return maintainerTest

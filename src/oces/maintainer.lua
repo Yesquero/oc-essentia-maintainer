@@ -11,6 +11,12 @@ local config = {
 	recordsPath = constants.defaultRecordsPath,
 }
 
+local printCfg = {
+	maxAspLen = 0,
+	maxNumLen = 5,
+	entriesPerRow = 4,
+}
+
 ---@class EssentiaMaintainer: AbstractClass
 ---@field aspectList {name: string, amount: integer, priority: integer}[]
 ---@field aspectLookup { [string]: integer }
@@ -42,8 +48,12 @@ end
 ---TODO: handle empty file case
 ---@return boolean
 function EssentiaMaintainer:readRecords()
-	local file = assert(io.open(self.config.recordsPath, "r"), "Could not open records file.")
-	self.aspectList = assert(serialization.unserialize(file:read("a")), "Error when reading records file.")
+	local file =
+		assert(io.open(self.config.recordsPath, "r"), "Could not open records file: " .. self.config.recordsPath)
+	self.aspectList = assert(
+		serialization.unserialize(file:read("a")),
+		"Error when reading records file: " .. self.config.recordsPath
+	)
 	file:close()
 
 	self:rebuildLookup()
@@ -128,17 +138,18 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
 	self.configPath = configPath or constants.defaultCfgPath
 	self.essentiaStorage = essentiaStorage
 	self:readConfig()
+	self:readRecords()
 end
 
 ---Returns a dict of missing aspects.
 ---@return { [string]: integer }
 function EssentiaMaintainer:getMissingAspects()
-	local availableAspects = self.essentiaStorage:getAspects()
+	local storedAspects = self.essentiaStorage:getAspects()
 	local missingAspect = {}
 
-	for key, val in pairs(self.aspectLookup) do
-		local amount = val - (availableAspects[key] or 0)
-		if amount > 0 then missingAspect[key] = amount end
+	for asp, ind in pairs(self.aspectLookup) do
+		local amount = self.aspectList[ind].amount - (storedAspects[asp] or 0)
+		if amount > 0 then missingAspect[asp] = amount end
 	end
 
 	return missingAspect

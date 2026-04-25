@@ -35,7 +35,7 @@ function EssentiaProvider:findItemStackToSmelt(missingAspects)
 		local newDifference = 0
 		local anyAspectPresent = false
 		for aspect, value in pairs(missingAspecRatio) do
-			anyAspectPresent = self.ItemDB.aspectLookup[aspect] ~= nil
+			if ratioDict[aspect] then anyAspectPresent = true end
 			newDifference = newDifference + math.abs(value - (ratioDict[aspect] or 0))
 		end
 

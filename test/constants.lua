@@ -12,7 +12,7 @@ local testConstants = {
 
 local EPConfig = {
 	efficiency = 0.8,
-	accelerationCards = 3,
+	accelerationCards = 2,
 	sourceType = "ExportBus",
 	smelterType = "EssentiaSmeltery",
 	smelterAdapterID = "e0eab32d-41e8-4a1a-aafd-c8bf15117ffd",
