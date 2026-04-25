@@ -1,5 +1,5 @@
 local constants = {
-    version = "0.9.1",
+    version = "0.9.2",
     defaultCfgPath = "/etc/oces.cfg",
     defaultRecordsPath = "/etc/oces-records.txt",
     defaultEPConfigPath = "/etc/oces-ep.cfg",
@@ -7,6 +7,7 @@ local constants = {
     defaultPollingInterval = 10,
     databaseSlots = 81,
     smelteryitemSlot = 1,
+    essentiaPerSecond = 1.0,
 }
 
 local SmelterType = {

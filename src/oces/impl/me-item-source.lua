@@ -52,6 +52,15 @@ local exportBusOps = {
     [3] = 64,
 }
 
+---Calcuelate wait time in seconds.
+---@param itemsInserted integer
+---@param essentiaPerItem integer
+---@param essentiaPerSecond number
+---@return integer
+local function calculateWaitTime(itemsInserted, essentiaPerItem, essentiaPerSecond)
+    return math.ceil(itemsInserted * essentiaPerItem / essentiaPerSecond)
+end
+
 ---Calculates amount of operations Export Bus should perfrom taking efficieny, stack size and number of Acceleration Cards into account.
 ---@param amount integer
 ---@param stackSize integer
@@ -72,31 +81,42 @@ function ExportBusIS:clearBusConfig() return self.exportBus.setExportConfigurati
 function ExportBusIS:isSmelterAvailable() return self.smeltery:isAvailable() end
 
 ---Attempt to insert specified amount of items into the Essentia Smelter. Takes efficiency, stack size and number of Acceleration Cards into account.
+---Returns amount of items inserted, anticipated time(sec) before smelter becomes available and optional error string.
 ---@param dbSlot integer
 ---@param amount integer
+---@return integer | nil
 ---@return integer | nil
 ---@return string?
 function ExportBusIS:smeltItems(dbSlot, amount)
     local found = self.meInterface.getItemsInNetwork({
         label = self.database.items[dbSlot].label,
     })
-    if not found[1] then return nil, "ME network has no items with label: " .. self.database.items[dbSlot].label end
+    if not found[1] then return nil, 0, "ME network has no items with label: " .. self.database.items[dbSlot].label end
 
     local res, msg = self:clearBusConfig()
-    if not res then return nil, msg end
+    if not res then return nil, 0, msg end
 
     res, msg = self:setBusConfig(dbSlot)
-    if not res then return nil, msg end
+    if not res then return nil, 0, msg end
 
     local totalInserted = 0
     for i = 1, self:calculateExportOps(amount, found[1].maxSize) do
         local res, msg = self.exportBus.exportIntoSlot(self.exportSide)
-        if not res then return res, msg end
+        if not res then
+            return res,
+                calculateWaitTime(
+                    totalInserted,
+                    self.ItemDB.items[dbSlot].totalAspects,
+                    self.smeltery.essentiaPerSecond
+                ),
+                msg
+        end
 
         totalInserted = totalInserted + res
     end
 
-    return totalInserted
+    return totalInserted,
+        calculateWaitTime(totalInserted, self.database.items[dbSlot].totalAspects, self.smeltery.essentiaPerSecond)
 end
 
 ---Attempts to find ItemStacks with specified aspect.

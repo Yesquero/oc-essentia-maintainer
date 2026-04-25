@@ -1,1 +1,3 @@
-print(tonumber("5"))
+local serialization = require("serialization")
+
+assert(serialization.serialize(""))

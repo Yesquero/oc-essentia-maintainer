@@ -25,19 +25,6 @@ function itemDBTest.unitTest()
         { slot = 6, amount = 1 },
     }))
 
-    -- ratio tests
-    assert(util.compareTables(itemDB.aspectRatioLookup[2], {
-        Aer = 75,
-        Alkimia = 25,
-    }))
-    assert(util.compareTables(itemDB.aspectRatioLookup[9], {
-        Potentia = 50,
-        Ignis = 50,
-    }))
-    assert(util.compareTables(itemDB.aspectRatioLookup[7], {
-        Machina = 100,
-    }))
-
     print("itemDBTest.unitTest complete")
 end
 

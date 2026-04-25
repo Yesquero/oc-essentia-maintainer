@@ -57,29 +57,30 @@ local function maintainerLoop(Maintainer, Provider)
 
         local missingAspects = Maintainer:getMissingAspects()
 
-        local res, msg = Provider:refillAspects(missingAspects)
+        --TODO: better communicate to user that we are waiting for smelter
+        local res, time, msg = Provider:refillAspects(missingAspects)
         if res then
-            print("Refilling aspects: " .. msg)
+            print(string.format("Refilling aspects: %s;\nWaiting for smelter to finish... (%i)", msg, time))
+            os.sleep(time)
         else
             print("Unable to refill aspects: " .. msg)
+            os.sleep(Maintainer.config.pollingInterval)
         end
-
-        os.sleep(Maintainer.config.pollingInterval)
     end
 end
 
 local function showHelp()
     local usage = [[
-	oces version %s 
-	Usage: oces [key] arg...
-	Keys:
-	--add <string> <integer>    Add Aspect to the list of maintained aspects.
-	--delete <string>           Delete Aspect from the list of maintained aspects.
-	--show                      Show list of maintained aspects.
-	--find <string> <integer>   Find all items with the specified aspect, sorted by its amount. Second arg is max number of results.
-	--start                     Start maintaining aspects, runs in foreground.
-	--help                      Show usage.
-	]]
+    oces version %s 
+    Usage: oces [key] arg...
+    Keys:
+    --add <string> <integer>    Add Aspect to the list of maintained aspects.
+    --delete <string>           Delete Aspect from the list of maintained aspects.
+    --show                      Show list of maintained aspects.
+    --find <string> <integer>   Find all items with the specified aspect, sorted by its amount. Second arg is max number of results.
+    --start                     Start maintaining aspects, runs in foreground.
+    --help                      Show usage.
+    ]]
 
     print(string.format(usage, constants.version))
 end
@@ -109,9 +110,7 @@ local function chooseFunction(args, ops)
         local maxRes = tonumber(args[2])
         if not maxRes then error("Invalid `find` argument: " .. args[2]) end
 
-        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
         local ItemDB = ItemDatabase:new(component.database)
-        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
         local Provider = EssentiaProvider:new(ItemDB)
         findAspectSource(Provider, args[1], maxRes)
     elseif ops.start then
