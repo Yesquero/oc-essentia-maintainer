@@ -1,3 +1,4 @@
+local filesystem = require("filesystem")
 local serialization = require("serialization")
 
 local Class = require("ysq.class")
@@ -32,15 +33,23 @@ local EssentiaMaintainer = Class:inherit({
     essentiaStorage = nil,
 })
 
+---@param path string
+local function createBlankRecords(path)
+    local file = assert(io.open(path, "w"))
+    file:write("{}")
+    file:close()
+end
+
 ---Read config from a file.
 ---TODO: create file with default values if none exists
 ---TODO: sanity check values
 ---@return boolean
 function EssentiaMaintainer:readConfig()
+    if not filesystem.exists(self.configPath) then createBlankRecords(self.configPath) end
+
     local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
     self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
     file:close()
-
     return true
 end
 
