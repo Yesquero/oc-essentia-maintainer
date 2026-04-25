@@ -1,4 +1,4 @@
-local EssentiaProvider = require("oces.essentiaProvider")
+local EssentiaProvider = require("oces.essentia-provider")
 local ItemDatabase = require("oces.item-database")
 
 local testConstants = require("test.constants")
@@ -64,15 +64,23 @@ local function testFindItemStack(ep)
 	}
 	assert(ep:findItemStackToSmelt(missingAspects) == 8)
 
-	print("essentiaProvider.findItemStackToSmelt test complete")
+	print("essentiaProvider.testFindItemStack complete")
 end
 
 ---@param ep EssentiaProvider
-local function testMakeAspects(ep)
+local function testFindAspectSource(ep)
+	assert(ep:findAspectSource("Invalid", 1) == nil)
+	assert(ep:findAspectSource("Vitium", 1)[1].label == "Vishroom")
+
+	print("essentiaProvider.testFindAspectSource complete")
+end
+
+---@param ep EssentiaProvider
+local function testRefillAspects(ep)
 	local missingAspects = {
 		InvalidAspect = -1,
 	}
-	local res, msg = ep:makeAspects(missingAspects)
+	local res, msg = ep:refillAspects(missingAspects)
 	assert(res == false and msg == "Database has no Item with required aspects.")
 
 	missingAspects = {
@@ -82,22 +90,14 @@ local function testMakeAspects(ep)
 		Perditio = 50,
 	}
 	component.smeltery.available = false
-	res, msg = ep:makeAspects(missingAspects)
+	res, msg = ep:refillAspects(missingAspects)
 	assert(res == false and msg == "Essentia Smelter is unavailable / proccessing items.")
 	component.smeltery.available = true
 
-	res, msg = ep:makeAspects(missingAspects)
+	res, msg = ep:refillAspects(missingAspects)
 	assert(res == true and msg == "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted.")
 
-	print("essentiaProvider.testMakeAspects test complete")
-end
-
----@param ep EssentiaProvider
-local function testFindAspectSource(ep)
-	assert(ep:findAspectSource("Invalid", 1) == nil)
-	assert(ep:findAspectSource("Vitium", 1)[1].label == "Vishroom")
-
-	print("essentiaProvider.findAspectSource test complete")
+	print("essentiaProvider.testRefillAspects complete")
 end
 
 function essentiaProviderTest.integrationTest()
@@ -118,7 +118,7 @@ function essentiaProviderTest.integrationTest()
 
 	testFindItemStack(ep)
 	testFindAspectSource(ep)
-	testMakeAspects(ep)
+	testRefillAspects(ep)
 
 	print("essentiaProviderTest.integrationTest complete")
 end

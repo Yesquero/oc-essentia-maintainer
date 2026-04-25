@@ -11,13 +11,13 @@ local config = {
 	recordsPath = constants.defaultRecordsPath,
 }
 
----@class Maintainer: AbstractClass
+---@class EssentiaMaintainer: AbstractClass
 ---@field aspectList {name: string, amount: integer, priority: integer}[]
 ---@field aspectLookup { [string]: integer }
 ---@field configPath string
 ---@field config MaintainerConfig
 ---@field essentiaStorage IEssentiaStorage
----@field new fun(self, configPath: string, essentiaStorage: IEssentiaStorage): Maintainer
+---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit({
 	aspectList = {},
 	aspectLookup = {},
@@ -31,7 +31,7 @@ local EssentiaMaintainer = Class:inherit({
 ---TODO: sanity check values
 ---@return boolean
 function EssentiaMaintainer:readConfig()
-	local file = assert(io.open(self.configPath, "r"), "Could not open config file.")
+	local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
 	self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
 	file:close()
 
@@ -124,9 +124,10 @@ function EssentiaMaintainer:rebuildLookup()
 end
 
 ---TODO check args ?
-function EssentiaMaintainer:initialize(configPath, essentiaStorage)
-	self.configPath = configPath
+function EssentiaMaintainer:initialize(essentiaStorage, configPath)
+	self.configPath = configPath or constants.defaultCfgPath
 	self.essentiaStorage = essentiaStorage
+	self:readConfig()
 end
 
 ---Returns a dict of missing aspects.

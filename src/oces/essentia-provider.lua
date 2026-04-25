@@ -10,7 +10,7 @@ local serialization = require("serialization")
 ---@alias EPConfig { efficiency: integer, accelerationCards: integer, sourceType: string, smelterType:string, smelterAdapterID:string, sourceAdapterID: string, interfaceAdaptedID: string}
 
 ---@class EssentiaProvider: AbstractClass
----@field new fun(self, ItemDB: ItemDB, configPath: string?)
+---@field new fun(self, ItemDB: ItemDB, configPath: string?): EssentiaProvider
 local EssentiaProvider = Class:inherit()
 
 ---@type IItemSource
@@ -104,7 +104,7 @@ function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSou
 ---@param missingAspects Aspects
 ---@return boolean | nil
 ---@return string?
-function EssentiaProvider:makeAspects(missingAspects)
+function EssentiaProvider:refillAspects(missingAspects)
 	local dbSlot = self:findItemStackToSmelt(missingAspects)
 	if not dbSlot then return false, "Database has no Item with required aspects." end
 

@@ -1,7 +1,7 @@
 local IEssentiaStorage = require("oces.interface.essentia-storage")
 
 ---@class InfusionProviderES: IEssentiaStorage
----@field new fun(infusionProvider: TEIP): InfusionProviderES
+---@field new fun(self, infusionProvider: TEIP): InfusionProviderES
 local InfusionProviderES = IEssentiaStorage:inherit()
 
 ---@type TEIP

@@ -1,5 +1,5 @@
 local constants = {
-	version = "0.0.1",
+	version = "0.9.0",
 	defaultCfgPath = "/etc/oces.cfg",
 	defaultRecordsPath = "/etc/oces-records.txt",
 	defaultEPConfigPath = "/etc/oces-ep.cfg",
