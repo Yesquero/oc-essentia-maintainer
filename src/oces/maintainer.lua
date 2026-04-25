@@ -45,8 +45,6 @@ end
 ---TODO: sanity check values
 ---@return boolean
 function EssentiaMaintainer:readConfig()
-    if not filesystem.exists(self.configPath) then createBlankRecords(self.configPath) end
-
     local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
     self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
     file:close()
@@ -57,6 +55,8 @@ end
 ---TODO: handle empty file case
 ---@return boolean
 function EssentiaMaintainer:readRecords()
+    if not filesystem.exists(self.config.recordsPath) then createBlankRecords(self.config.recordsPath) end
+
     local file =
         assert(io.open(self.config.recordsPath, "r"), "Could not open records file: " .. self.config.recordsPath)
     self.aspectList = assert(
