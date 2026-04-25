@@ -1,6 +1,8 @@
 # Compiled Lua sources
 luac.out
 
+test/data/oces-records.txt
+
 # luarocks build files
 *.src.rock
 *.zip
