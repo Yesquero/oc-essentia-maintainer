@@ -9,7 +9,7 @@ local database = {
 }
 
 ---@alias Aspects { [string]: integer }
----@alias DBItemStack { oreNames: string[], size: integer, name: string, id: integer, damage: integer, maxSize: integer, label: string, hasTag: boolean, maxDamage: integer, aspects: Aspects[]? }
+---@alias DBItemStack { oreNames: string[], size: integer, name: string, id: integer, damage: integer, maxSize: integer, label: string, hasTag: boolean, maxDamage: integer, aspects: Aspects? }
 
 ---Get the representation of the item stack stored in the specified slot.
 ---@param slot number

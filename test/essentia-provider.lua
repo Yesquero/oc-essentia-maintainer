@@ -51,7 +51,7 @@ local function testFindItemStack(ep)
         Ignis = 525,
         Potentia = 425,
     }
-    assert(ep:findItemStackToSmelt(missingAspects) == 9)
+    assert(ep:findItemStackToSmelt(missingAspects) == 3)
 
     missingAspects = {
         Vitreus = 50,
@@ -73,16 +73,16 @@ local function testFindItemStack(ep)
     }
     assert(ep:findItemStackToSmelt(missingAspects) == 2)
 
-    -- missingAspects = {
-    --     Vitium = 800,
-    --     Ordo = 450,
-    --     Terra = 490,
-    --     Perditio = 500,
-    --     Aqua = 500,
-    --     Ignis = 500,
-    --     Aer = 500,
-    -- }
-    -- assert(ep:findItemStackToSmelt(missingAspects) == 2)
+    missingAspects = {
+        Vitium = 800,
+        Ordo = 450,
+        Terra = 490,
+        Perditio = 500,
+        Aqua = 500,
+        Ignis = 500,
+        Aer = 500,
+    }
+    assert(ep:findItemStackToSmelt(missingAspects) == 2)
 
     print("essentiaProvider.testFindItemStack complete")
 end
@@ -102,8 +102,8 @@ local function testRefillAspects(ep, em)
     local missingAspects = {
         InvalidAspect = -1,
     }
-    local res, msg = ep:refillAspects(missingAspects)
-    assert(res == false and msg == "Database has no Item with required aspects.")
+    local res, time, msg = ep:refillAspects(missingAspects)
+    assert(res == false and msg == "Database has no Item with required aspects." and time == 0)
 
     missingAspects = {
         Vitium = 800,
@@ -112,12 +112,12 @@ local function testRefillAspects(ep, em)
         Perditio = 50,
     }
     component.smeltery.available = false
-    res, msg = ep:refillAspects(missingAspects)
-    assert(res == false and msg == "Essentia Smelter is unavailable / proccessing items.")
+    res, time, msg = ep:refillAspects(missingAspects)
+    assert(res == false and msg == "Essentia Smelter is unavailable / proccessing items." and time == 0)
     component.smeltery.available = true
 
-    res, msg = ep:refillAspects(missingAspects)
-    assert(res == true and msg == "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted.")
+    res, time, msg = ep:refillAspects(missingAspects)
+    assert(res == true and msg == "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted." and time == 555)
 
     missingAspects = {
         Aer = 1000,
@@ -125,13 +125,13 @@ local function testRefillAspects(ep, em)
         Potentia = 250,
         Sonus = 100,
     }
-    res, msg = ep:refillAspects(missingAspects)
-    assert(res == true and msg == "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted.")
+    res, time, msg = ep:refillAspects(missingAspects)
+    assert(res == true and msg == "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted." and time == 640)
 
     em:addAspect("Machina", 231)
     em:addAspect("Metallum", 10)
-    res, msg = ep:refillAspects(em:getMissingAspects())
-    assert(res == true and msg == "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted.")
+    res, time, msg = ep:refillAspects(em:getMissingAspects())
+    assert(res == true and msg == "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted." and time == 107)
 
     print("essentiaProvider.testRefillAspects complete")
 end

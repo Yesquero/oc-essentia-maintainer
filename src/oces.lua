@@ -57,14 +57,15 @@ local function maintainerLoop(Maintainer, Provider)
 
         local missingAspects = Maintainer:getMissingAspects()
 
-        local res, msg = Provider:refillAspects(missingAspects)
+        --TODO: better communicate to user that we are waiting for smelter
+        local res, time, msg = Provider:refillAspects(missingAspects)
         if res then
-            print("Refilling aspects: " .. msg)
+            print(string.format("Refilling aspects: %s;\nWaiting for smelter to finish... (%i)", msg, time))
+            os.sleep(time)
         else
             print("Unable to refill aspects: " .. msg)
+            os.sleep(Maintainer.config.pollingInterval)
         end
-
-        os.sleep(Maintainer.config.pollingInterval)
     end
 end
 

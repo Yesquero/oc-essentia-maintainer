@@ -2,12 +2,11 @@ local Class = require("ysq.class")
 local MEItemSource = require("oces.impl.me-item-source")
 local SBSmeltery = require("oces.impl.sb-smeltery")
 local constants = require("oces.constants")
-local ocesUtil = require("oces.utility")
 
 local component = require("component")
 local serialization = require("serialization")
 
----@alias EPConfig { efficiency: integer, accelerationCards: integer, sourceType: string, smelterType:string, smelterAdapterID:string, sourceAdapterID: string, interfaceAdaptedID: string}
+---@alias EPConfig { efficiency: integer, accelerationCards: integer, sourceType: string, smelterType:string, essentiaPerSecond:number, smelterAdapterID:string, sourceAdapterID: string, interfaceAdaptedID: string}
 
 ---@class EssentiaProvider: AbstractClass
 ---@field new fun(self, ItemDB: ItemDB, configPath: string?): EssentiaProvider
@@ -27,21 +26,22 @@ EssentiaProvider.configPath = nil
 function EssentiaProvider:findItemStackToSmelt(missingAspects)
     ---@type integer
     local dbSlot = nil
-    local ratioDifference = math.maxinteger
+    local bestScore = 0.0
 
-    local missingAspectRatio = ocesUtil.valToPercentDict(missingAspects)
+    local totalMissing = 0
+    for k, v in pairs(missingAspects) do
+        totalMissing = totalMissing + missingAspects[k]
+    end
 
-    for index, ratioDict in pairs(self.ItemDB.aspectRatioLookup) do
-        local newDifference = 0
-        local anyAspectPresent = false
-        for aspect, value in pairs(missingAspectRatio) do
-            if ratioDict[aspect] then anyAspectPresent = true end
-            newDifference = newDifference + math.abs(value - (ratioDict[aspect] or 0))
+    for ind, val in ipairs(self.ItemDB.items) do
+        local score = 0.0
+        for asp, amt in pairs(missingAspects) do
+            score = score + ((val.aspects[asp] or 0) * amt / totalMissing)
         end
 
-        if anyAspectPresent and newDifference < ratioDifference then
-            dbSlot = index
-            ratioDifference = newDifference
+        if score > bestScore then
+            bestScore = score
+            dbSlot = ind
         end
     end
 
@@ -75,7 +75,8 @@ function EssentiaProvider:readConfig()
     local smeltery = typeNewLookup[epConfig.smelterType](
         typeSelfLookup[epConfig.smelterType],
         component.proxy(epConfig.smelterAdapterID),
-        epConfig.efficiency
+        epConfig.efficiency,
+        epConfig.essentiaPerSecond
     )
 
     ---@diagnostic disable
@@ -103,13 +104,14 @@ function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSou
 ---Attempts to use associated ItemSource to make missing aspects.
 ---@param missingAspects Aspects
 ---@return boolean | nil
+---@return integer?
 ---@return string?
 function EssentiaProvider:refillAspects(missingAspects)
     local dbSlot = self:findItemStackToSmelt(missingAspects)
-    if not dbSlot then return false, "Database has no Item with required aspects." end
+    if not dbSlot then return false, 0, "Database has no Item with required aspects." end
 
     if not self.itemSource:isSmelterAvailable() then
-        return false, "Essentia Smelter is unavailable / proccessing items."
+        return false, 0, "Essentia Smelter is unavailable / proccessing items."
     end
 
     local amount = 0
@@ -117,12 +119,13 @@ function EssentiaProvider:refillAspects(missingAspects)
         amount = math.max(amount, math.ceil((missingAspects[asp] or 0) / val))
     end
 
-    local res, msg = self.itemSource:smeltItems(dbSlot, amount)
+    local res, time, msg = self.itemSource:smeltItems(dbSlot, amount)
     if res then
         return true,
+            time,
             string.format("(Requested)/(Actual): %i / %i %s(s) inserted.", amount, res, self.ItemDB.items[dbSlot].label)
     else
-        return false, msg
+        return false, 0, msg
     end
 end
 

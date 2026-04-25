@@ -14,8 +14,10 @@ function IItemSource:isSmelterAvailable() error("not implemented") end
 
 ---Attempts to insert specified amount of items matching the ItemStack in dbSlot into attached item smelter.
 ---Note that if smelter efficiency is not 100% then more or less items will be inserted, depending on exact efficiency.
+---Returns amount of items inserted, antitipated time(sec) before smelter becomes available and optional error string.
 ---@param dbSlot integer
 ---@param amount integer
+---@return integer | nil
 ---@return integer | nil
 ---@return string?
 function IItemSource:smeltItems(dbSlot, amount) error("not implemented") end
