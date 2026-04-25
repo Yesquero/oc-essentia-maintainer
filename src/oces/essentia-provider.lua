@@ -2,6 +2,7 @@ local Class = require("ysq.class")
 local MEItemSource = require("oces.impl.me-item-source")
 local SBSmeltery = require("oces.impl.sb-smeltery")
 local constants = require("oces.constants")
+local util = require("ysq.utility")
 
 local component = require("component")
 local serialization = require("serialization")
@@ -107,6 +108,8 @@ function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSou
 ---@return integer?
 ---@return string?
 function EssentiaProvider:refillAspects(missingAspects)
+    if util.isTableEmpty(missingAspects) then return false, 0, "No Aspects missing." end
+
     local dbSlot = self:findItemStackToSmelt(missingAspects)
     if not dbSlot then return false, 0, "Database has no Item with required aspects." end
 

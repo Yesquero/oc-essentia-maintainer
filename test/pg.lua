@@ -1,3 +1,4 @@
-local serialization = require("serialization")
+local function isTableEmpty(table) return type(next(table)) == "nil" end
 
-assert(serialization.serialize(""))
+print(isTableEmpty({}))
+print(isTableEmpty({ str = 1 }))
