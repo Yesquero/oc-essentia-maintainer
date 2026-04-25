@@ -14,10 +14,10 @@ SBSmeltery.type = constants.SmelterType.EssentiaSmeltery
 function SBSmeltery:isAvailable() return self.smeltery.getStackInSlot(constants.smelteryitemSlot).id == 0 end
 
 function SBSmeltery:initialize(smeltery, efficinecy)
-	assert(smeltery, "Essentia Smeltery component is null")
-	assert(type(efficinecy) == "number" and efficinecy > 0, "Essentia Smeltery invalid efficiency" .. efficinecy)
-	self.efficiency = efficinecy
-	self.smeltery = smeltery
+    assert(smeltery, "Essentia Smeltery component is null")
+    assert(type(efficinecy) == "number" and efficinecy > 0, "Essentia Smeltery invalid efficiency" .. efficinecy)
+    self.efficiency = efficinecy
+    self.smeltery = smeltery
 end
 
 return SBSmeltery

@@ -7,13 +7,13 @@ smeltery.available = true
 ---@param slot number
 ---@return DBItemStack
 function smeltery.getStackInSlot(slot)
-	if slot == smeltery.validSlot and smeltery.available then
-		return { id = 0 }
-	elseif slot == smeltery.validSlot and not smeltery.available then
-		return { id = 1 }
-	else
-		error("side index out of bounds")
-	end
+    if slot == smeltery.validSlot and smeltery.available then
+        return { id = 0 }
+    elseif slot == smeltery.validSlot and not smeltery.available then
+        return { id = 1 }
+    else
+        error("side index out of bounds")
+    end
 end
 
 return smeltery

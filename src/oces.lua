@@ -12,23 +12,23 @@ local constants = require("oces.constants")
 ---@param name string
 ---@param amount integer
 local function addAspect(Maintainer, name, amount)
-	local res = Maintainer:addAspect(name, amount)
-	if res then
-		print("Added aspect: " .. name)
-	else
-		print("Could not add aspect: " .. name)
-	end
+    local res = Maintainer:addAspect(name, amount)
+    if res then
+        print("Added aspect: " .. name)
+    else
+        print("Could not add aspect: " .. name)
+    end
 end
 
 ---@param Maintainer EssentiaMaintainer
 ---@param name string
 local function deleteAspect(Maintainer, name)
-	local res, msg = Maintainer:deleteAspect(name)
-	if res then
-		print("Deleted aspect: " .. name)
-	else
-		print("Could not delete aspect: " .. name .. "; " .. msg)
-	end
+    local res, msg = Maintainer:deleteAspect(name)
+    if res then
+        print("Deleted aspect: " .. name)
+    else
+        print("Could not delete aspect: " .. name .. "; " .. msg)
+    end
 end
 
 ---@param Maintainer EssentiaMaintainer
@@ -38,38 +38,38 @@ local function showAspects(Maintainer) print(Maintainer:showAspectList()) end
 ---@param name string
 ---@param maxResults integer
 local function findAspectSource(Provider, name, maxResults)
-	local res, msg = Provider:findAspectSource(name, maxResults or 1)
-	if res then
-		for ind, val in ipairs(res) do
-			print(string.format("%s: %i %s", val.label, val.aspects[name], name))
-		end
-	else
-		print(msg)
-	end
+    local res, msg = Provider:findAspectSource(name, maxResults or 1)
+    if res then
+        for ind, val in ipairs(res) do
+            print(string.format("%s: %i %s", val.label, val.aspects[name], name))
+        end
+    else
+        print(msg)
+    end
 end
 
 ---@param Maintainer EssentiaMaintainer
 ---@param Provider EssentiaProvider
 local function maintainerLoop(Maintainer, Provider)
-	while true do
-		term.clear()
-		print(Maintainer:showAspectList())
+    while true do
+        term.clear()
+        print(Maintainer:showAspectList())
 
-		local missingAspects = Maintainer:getMissingAspects()
+        local missingAspects = Maintainer:getMissingAspects()
 
-		local res, msg = Provider:refillAspects(missingAspects)
-		if res then
-			print("Refilling aspects: " .. msg)
-		else
-			print("Unable to refill aspects: " .. msg)
-		end
+        local res, msg = Provider:refillAspects(missingAspects)
+        if res then
+            print("Refilling aspects: " .. msg)
+        else
+            print("Unable to refill aspects: " .. msg)
+        end
 
-		os.sleep(Maintainer.config.pollingInterval)
-	end
+        os.sleep(Maintainer.config.pollingInterval)
+    end
 end
 
 local function showHelp()
-	local usage = [[
+    local usage = [[
 	oces version %s 
 	Usage: oces [key] arg...
 	Keys:
@@ -81,57 +81,57 @@ local function showHelp()
 	--help                      Show usage.
 	]]
 
-	print(string.format(usage, constants.version))
+    print(string.format(usage, constants.version))
 end
 
 ---@param args any[]
 ---@param ops {[string]: boolean}
 local function chooseFunction(args, ops)
-	if ops.add then
-		local amount = tonumber(args[2])
-		if not amount then error("Invalid `add` argument: " .. args[2]) end
+    if ops.add then
+        local amount = tonumber(args[2])
+        if not amount then error("Invalid `add` argument: " .. args[2]) end
 
-		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
 
-		addAspect(Maintainer, args[1], amount)
-	elseif ops.delete then
-		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+        addAspect(Maintainer, args[1], amount)
+    elseif ops.delete then
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
 
-		deleteAspect(Maintainer, args[1])
-	elseif ops.show then
-		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+        deleteAspect(Maintainer, args[1])
+    elseif ops.show then
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
 
-		showAspects(Maintainer)
-	elseif ops.find then
-		local maxRes = tonumber(args[2])
-		if not maxRes then error("Invalid `find` argument: " .. args[2]) end
+        showAspects(Maintainer)
+    elseif ops.find then
+        local maxRes = tonumber(args[2])
+        if not maxRes then error("Invalid `find` argument: " .. args[2]) end
 
-		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-		local ItemDB = ItemDatabase:new(component.database)
-		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
-		local Provider = EssentiaProvider:new(ItemDB)
-		findAspectSource(Provider, args[1], maxRes)
-	elseif ops.start then
-		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-		local ItemDB = ItemDatabase:new(component.database)
-		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
-		local Provider = EssentiaProvider:new(ItemDB)
-		maintainerLoop(Maintainer, Provider)
-	elseif ops.help then
-		showHelp()
-	else
-		error("Invalid programm options.")
-	end
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local ItemDB = ItemDatabase:new(component.database)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+        local Provider = EssentiaProvider:new(ItemDB)
+        findAspectSource(Provider, args[1], maxRes)
+    elseif ops.start then
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local ItemDB = ItemDatabase:new(component.database)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+        local Provider = EssentiaProvider:new(ItemDB)
+        maintainerLoop(Maintainer, Provider)
+    elseif ops.help then
+        showHelp()
+    else
+        error("Invalid programm options.")
+    end
 end
 
 local function main(...)
-	local args, ops = shell.parse(...)
+    local args, ops = shell.parse(...)
 
-	local res, msg = pcall(chooseFunction, args, ops)
-	if not res then print("Something went wrong: " .. msg) end
+    local res, msg = pcall(chooseFunction, args, ops)
+    if not res then print("Something went wrong: " .. msg) end
 end
 
 main(...)
