@@ -6,9 +6,15 @@ local util = require("ysq.utility")
 
 ---@class MaintainerConfig
 local config = {
-	defaultPriority = constants.defaultPriority,
-	pollingInterval = constants.defaultPollingInterval,
-	recordsPath = constants.defaultRecordsPath,
+    defaultPriority = constants.defaultPriority,
+    pollingInterval = constants.defaultPollingInterval,
+    recordsPath = constants.defaultRecordsPath,
+}
+
+local printCfg = {
+    maxAspLen = 0,
+    maxNumLen = 5,
+    entriesPerRow = 4,
 }
 
 ---@class EssentiaMaintainer: AbstractClass
@@ -19,11 +25,11 @@ local config = {
 ---@field essentiaStorage IEssentiaStorage
 ---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit({
-	aspectList = {},
-	aspectLookup = {},
-	configPath = constants.defaultCfgPath,
-	config = config,
-	essentiaStorage = nil,
+    aspectList = {},
+    aspectLookup = {},
+    configPath = constants.defaultCfgPath,
+    config = config,
+    essentiaStorage = nil,
 })
 
 ---Read config from a file.
@@ -31,24 +37,28 @@ local EssentiaMaintainer = Class:inherit({
 ---TODO: sanity check values
 ---@return boolean
 function EssentiaMaintainer:readConfig()
-	local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
-	self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
-	file:close()
+    local file = assert(io.open(self.configPath, "r"), "Could not open config file: " .. self.configPath)
+    self.config = assert(serialization.unserialize(file:read("a")), "Error when reading config file.")
+    file:close()
 
-	return true
+    return true
 end
 
 ---Read list of aspects to maintain from a file.
 ---TODO: handle empty file case
 ---@return boolean
 function EssentiaMaintainer:readRecords()
-	local file = assert(io.open(self.config.recordsPath, "r"), "Could not open records file.")
-	self.aspectList = assert(serialization.unserialize(file:read("a")), "Error when reading records file.")
-	file:close()
+    local file =
+        assert(io.open(self.config.recordsPath, "r"), "Could not open records file: " .. self.config.recordsPath)
+    self.aspectList = assert(
+        serialization.unserialize(file:read("a")),
+        "Error when reading records file: " .. self.config.recordsPath
+    )
+    file:close()
 
-	self:rebuildLookup()
+    self:rebuildLookup()
 
-	return true
+    return true
 end
 
 ---Add an aspect to list of aspect to maintain, uses default priority from config if none given.
@@ -58,20 +68,20 @@ end
 ---@param priority integer?
 ---@return boolean
 function EssentiaMaintainer:addAspect(name, amount, priority)
-	assert(name and type(name) == "string", "addAspect invalid argument(s)")
-	assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
+    assert(name and type(name) == "string", "addAspect invalid argument(s)")
+    assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
 
-	self:readRecords()
-	self.aspectList[#self.aspectList + 1] = {
-		name = name,
-		amount = amount,
-		priority = priority or self.config.defaultPriority,
-	}
+    self:readRecords()
+    self.aspectList[#self.aspectList + 1] = {
+        name = name,
+        amount = amount,
+        priority = priority or self.config.defaultPriority,
+    }
 
-	self:saveRecords()
-	self:rebuildLookup()
+    self:saveRecords()
+    self:rebuildLookup()
 
-	return true
+    return true
 end
 
 ---Delete aspect with given name from the list of aspects to maintain.
@@ -82,66 +92,99 @@ end
 ---@return boolean
 ---@return string?
 function EssentiaMaintainer:deleteAspect(name)
-	assert(name and type(name) == "string", "deleteAspect invalid argument(s)")
+    assert(name and type(name) == "string", "deleteAspect invalid argument(s)")
 
-	self:readRecords()
-	if #self.aspectList == 0 then return true end
+    self:readRecords()
+    if #self.aspectList == 0 then return true end
 
-	local res = util.arrayRemove(self.aspectList, function(val) return val.name == name end)
-	if res then
-		self:saveRecords()
-		return true
-	end
+    local res = util.arrayRemove(self.aspectList, function(val) return val.name == name end)
+    if res then
+        self:saveRecords()
+        return true
+    end
 
-	return false, "Could not find saved aspect with matching name: " .. name
+    return false, "Could not find saved aspect with matching name: " .. name
 end
 
----Uses OC serialization pretty print to visualize currently maintained aspects.
+---Returns stylized string representation of maintained aspects.
 ---@return string
-function EssentiaMaintainer:showAspectList() return serialization.serialize(self.aspectList, true) end
+function EssentiaMaintainer:showAspectList()
+    local storedAspects = self.essentiaStorage:getAspects()
+    --return serialization.serialize(self.aspectList, true)
+    local res = ""
+    local cnt = 0
+
+    for ind, val in ipairs(self.aspectList) do
+        cnt = cnt + 1
+
+        local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
+        local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
+        local secondNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(val.amount))
+
+        res = res
+            .. string.format(
+                "%s:%s%s%i / %i%s; ",
+                val.name,
+                namePadding,
+                firstNumPadding,
+                (storedAspects[val.name] or 0),
+                val.amount,
+                secondNumPadding
+            )
+
+        if cnt == printCfg.entriesPerRow then
+            res = res .. "\n"
+            cnt = 0
+        end
+    end
+
+    return res
+end
 
 ---Save current list of maintained aspect to a file.
 ---@return boolean
 function EssentiaMaintainer:saveRecords()
-	local file = assert(io.open(self.config.recordsPath, "w"))
-	file = assert(io.open(self.config.recordsPath, "w"), "Error when writing to records file.")
-	file:write(serialization.serialize(self.aspectList))
-	file:close()
+    local file = assert(io.open(self.config.recordsPath, "w"))
+    file = assert(io.open(self.config.recordsPath, "w"), "Error when writing to records file.")
+    file:write(serialization.serialize(self.aspectList))
+    file:close()
 
-	return true
+    return true
 end
 
 ---Rebuild aspects lookup table based on maintained aspects.
 function EssentiaMaintainer:rebuildLookup()
-	self.aspectLookup = {}
+    self.aspectLookup = {}
 
-	local sortByPriority = function(left, right) return left.priority > right.priority end
-	table.sort(self.aspectList, sortByPriority)
+    local sortByPriority = function(left, right) return left.priority > right.priority end
+    table.sort(self.aspectList, sortByPriority)
 
-	for i = 1, #self.aspectList do
-		self.aspectLookup[self.aspectList[i].name] = i
-	end
+    for i = 1, #self.aspectList do
+        printCfg.maxAspLen = math.max(printCfg.maxAspLen, #self.aspectList[i].name)
+        self.aspectLookup[self.aspectList[i].name] = i
+    end
 end
 
 ---TODO check args ?
 function EssentiaMaintainer:initialize(essentiaStorage, configPath)
-	self.configPath = configPath or constants.defaultCfgPath
-	self.essentiaStorage = essentiaStorage
-	self:readConfig()
+    self.configPath = configPath or constants.defaultCfgPath
+    self.essentiaStorage = essentiaStorage
+    self:readConfig()
+    self:readRecords()
 end
 
 ---Returns a dict of missing aspects.
 ---@return { [string]: integer }
 function EssentiaMaintainer:getMissingAspects()
-	local availableAspects = self.essentiaStorage:getAspects()
-	local missingAspect = {}
+    local storedAspects = self.essentiaStorage:getAspects()
+    local missingAspect = {}
 
-	for key, val in pairs(self.aspectLookup) do
-		local amount = val - (availableAspects[key] or 0)
-		if amount > 0 then missingAspect[key] = amount end
-	end
+    for asp, ind in pairs(self.aspectLookup) do
+        local amount = self.aspectList[ind].amount - (storedAspects[asp] or 0)
+        if amount > 0 then missingAspect[asp] = amount end
+    end
 
-	return missingAspect
+    return missingAspect
 end
 
 return EssentiaMaintainer

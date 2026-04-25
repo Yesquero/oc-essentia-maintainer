@@ -3,9 +3,9 @@ local serialization = require("serialization")
 
 ---@class DatabaseComponent
 local database = {
-	type = "database",
-	dummyData = {},
-	address = "ab142877-2995-479c-b1e6-363146c898d0",
+    type = "database",
+    dummyData = {},
+    address = "ab142877-2995-479c-b1e6-363146c898d0",
 }
 
 ---@alias Aspects { [string]: integer }
@@ -18,15 +18,15 @@ function database.get(slot) return database.dummyData[slot] end
 
 -- TODO: make function package private
 local function loadData()
-	local file = assert(io.open(mockConstants.dummyDBdataPath, "r"))
-	local i, line = 1, file:read()
-	while line do
-		database.dummyData[i] = serialization.unserialize(line)
+    local file = assert(io.open(mockConstants.dummyDBdataPath, "r"))
+    local i, line = 1, file:read()
+    while line do
+        database.dummyData[i] = serialization.unserialize(line)
 
-		line = file:read()
-		i = i + 1
-	end
-	file:close()
+        line = file:read()
+        i = i + 1
+    end
+    file:close()
 end
 
 loadData()

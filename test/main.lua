@@ -5,19 +5,22 @@ local mockEssentiaStorage = require("test.mock-essentia-storage")
 local utilityTest = require("test.utility")
 
 local function runTests()
-	print("Running tests...")
+    print("Running tests...")
 
-	mockEssentiaStorage.unitTest()
+    mockEssentiaStorage.unitTest()
 
-	utilityTest.testArrayRemove()
+    utilityTest.testArrayRemove()
 
-	maintainerTest.unitTest()
+    maintainerTest.testInit()
+    maintainerTest.unitTest()
+    maintainerTest.integrationTest()
+    maintainerTest.showTest()
 
-	itemDBTest.unitTest()
+    itemDBTest.unitTest()
 
-	essentiaProviderTest.integrationTest()
+    essentiaProviderTest.integrationTest()
 
-	print("Tests complete")
+    print("Tests complete")
 end
 
 runTests()

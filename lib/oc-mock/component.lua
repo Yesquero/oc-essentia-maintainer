@@ -6,15 +6,15 @@ local thaumicenergistics_infusion_provider = require("oc-mock.te-infusion-provid
 
 ---@class Component
 local component = {
-	---@type DatabaseComponent
-	database = database,
-	---@type TEIP
-	thaumicenergistics_infusion_provider = thaumicenergistics_infusion_provider,
-	---@type MEEBus
-	me_exportbus = me_exportbus,
-	---@type MEInterface
-	me_interface = me_interface,
-	smeltery = smeltery,
+    ---@type DatabaseComponent
+    database = database,
+    ---@type TEIP
+    thaumicenergistics_infusion_provider = thaumicenergistics_infusion_provider,
+    ---@type MEEBus
+    me_exportbus = me_exportbus,
+    ---@type MEInterface
+    me_interface = me_interface,
+    smeltery = smeltery,
 }
 
 ---Return component with given id.

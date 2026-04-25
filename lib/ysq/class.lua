@@ -13,20 +13,20 @@ function Class:initialize(...) error("not implemented") end
 ---@param prototype table?
 ---@return table
 function Class:inherit(prototype)
-	local subclass = prototype or {}
-	subclass.__index = subclass
-	setmetatable(subclass, self)
-	return subclass
+    local subclass = prototype or {}
+    subclass.__index = subclass
+    setmetatable(subclass, self)
+    return subclass
 end
 
 ---Make a new instace, forwards all args to initialize()
 ---@param ... unknown
 ---@return table
 function Class:new(...)
-	local instance = {}
-	setmetatable(instance, self)
-	self.initialize(instance, ...)
-	return instance
+    local instance = {}
+    setmetatable(instance, self)
+    self.initialize(instance, ...)
+    return instance
 end
 
 return Class

@@ -12,8 +12,8 @@ function InfusionProviderES:getAspect(name) return self.component.getAspectCount
 function InfusionProviderES:getAspects() return self.component.getAspects() end
 
 function InfusionProviderES:initialize(infusionProvider)
-	assert(infusionProvider, "Infusion Provider is null")
-	self.component = infusionProvider
+    assert(infusionProvider, "Infusion Provider is null")
+    self.component = infusionProvider
 end
 
 return InfusionProviderES
