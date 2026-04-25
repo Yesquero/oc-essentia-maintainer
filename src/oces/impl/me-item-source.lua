@@ -32,7 +32,7 @@ function ExportBusIS:initialize(itemDatabase, exportBus, smeltery, accelerationC
 
     for i = 1, 5, 1 do
         local res, msg = self.exportBus.getExportConfiguration(i)
-        if res == nil and msg == nil then self.exportSide = i end
+        if res ~= nil or (res == nil and msg == nil) then self.exportSide = i end
     end
 end
 
