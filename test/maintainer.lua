@@ -87,4 +87,19 @@ function maintainerTest.integrationTest()
 	print("maintainerTest.integrationTest complete")
 end
 
+function maintainerTest.showTest()
+	util.clearFile(testConstants.recordsPath, true)
+	local MockES = MockEssentiaStorage:new()
+	local maintainer = EssentiaMaintainer:new(MockES, testConstants.cfgPath)
+
+	maintainer:addAspect("Metallum", 991)
+	maintainer:addAspect("Potentia", 10)
+	maintainer:addAspect("Vitium", 1000)
+	maintainer:addAspect("Ordo", 500)
+	maintainer:addAspect("Perditio", 10000)
+	maintainer:addAspect("Sonus", 1)
+	maintainer:addAspect("Aer", 700)
+	print(maintainer:showAspectList())
+end
+
 return maintainerTest

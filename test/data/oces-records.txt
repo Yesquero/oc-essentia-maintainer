@@ -1,1 +1,1 @@
-{{amount=231,priority=10,name="Machina"},{amount=10,priority=10,name="Metallum"}}
+{{amount=231,name="Machina",priority=10},{amount=10,name="Metallum",priority=10}}

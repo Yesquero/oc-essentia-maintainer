@@ -106,9 +106,40 @@ function EssentiaMaintainer:deleteAspect(name)
 	return false, "Could not find saved aspect with matching name: " .. name
 end
 
----Uses OC serialization pretty print to visualize currently maintained aspects.
+---Returns stylized string representation of maintained aspects.
 ---@return string
-function EssentiaMaintainer:showAspectList() return serialization.serialize(self.aspectList, true) end
+function EssentiaMaintainer:showAspectList()
+	local storedAspects = self.essentiaStorage:getAspects()
+	--return serialization.serialize(self.aspectList, true)
+	local res = ""
+	local cnt = 0
+
+	for ind, val in ipairs(self.aspectList) do
+		cnt = cnt + 1
+
+		local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
+		local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
+		local secondNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(val.amount))
+
+		res = res
+			.. string.format(
+				"%s:%s%s%i / %i%s; ",
+				val.name,
+				namePadding,
+				firstNumPadding,
+				(storedAspects[val.name] or 0),
+				val.amount,
+				secondNumPadding
+			)
+
+		if cnt == printCfg.entriesPerRow then
+			res = res .. "\n"
+			cnt = 0
+		end
+	end
+
+	return res
+end
 
 ---Save current list of maintained aspect to a file.
 ---@return boolean
@@ -129,6 +160,7 @@ function EssentiaMaintainer:rebuildLookup()
 	table.sort(self.aspectList, sortByPriority)
 
 	for i = 1, #self.aspectList do
+		printCfg.maxAspLen = math.max(printCfg.maxAspLen, #self.aspectList[i].name)
 		self.aspectLookup[self.aspectList[i].name] = i
 	end
 end

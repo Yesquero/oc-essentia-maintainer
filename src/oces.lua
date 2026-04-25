@@ -8,15 +8,6 @@ local InfusionProvider = require("oces.impl.infusion-provider-es")
 local ItemDatabase = require("oces.item-database")
 local constants = require("oces.constants")
 
-local function init()
-	local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
-	local ItemDB = ItemDatabase:new(component.database)
-	local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
-	local Provider = EssentiaProvider:new(ItemDB)
-
-	return EssentiaStorage, ItemDB, Maintainer, Provider
-end
-
 ---@param Maintainer EssentiaMaintainer
 ---@param name string
 ---@param amount integer
@@ -95,22 +86,39 @@ end
 
 ---@param args any[]
 ---@param ops {[string]: boolean}
----@param Maintainer EssentiaMaintainer
----@param Provider EssentiaProvider
-local function chooseFunction(args, ops, Maintainer, Provider)
+local function chooseFunction(args, ops)
 	if ops.add then
 		local amount = tonumber(args[2])
 		if not amount then error("Invalid `add` argument: " .. args[2]) end
+
+		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+
 		addAspect(Maintainer, args[1], amount)
 	elseif ops.delete then
+		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+
 		deleteAspect(Maintainer, args[1])
 	elseif ops.show then
+		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+
 		showAspects(Maintainer)
 	elseif ops.find then
 		local maxRes = tonumber(args[2])
 		if not maxRes then error("Invalid `find` argument: " .. args[2]) end
+
+		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+		local ItemDB = ItemDatabase:new(component.database)
+		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+		local Provider = EssentiaProvider:new(ItemDB)
 		findAspectSource(Provider, args[1], maxRes)
 	elseif ops.start then
+		local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+		local ItemDB = ItemDatabase:new(component.database)
+		local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+		local Provider = EssentiaProvider:new(ItemDB)
 		maintainerLoop(Maintainer, Provider)
 	elseif ops.help then
 		showHelp()
@@ -120,15 +128,9 @@ local function chooseFunction(args, ops, Maintainer, Provider)
 end
 
 local function main(...)
-	local initRes, EssentiaStorage, ItemDB, Maintainer, Provider = pcall(init)
-	if not initRes then
-		print("Something went wrong: " .. EssentiaStorage)
-		return
-	end
-
 	local args, ops = shell.parse(...)
 
-	local res, msg = pcall(chooseFunction, args, ops, Maintainer, Provider)
+	local res, msg = pcall(chooseFunction, args, ops)
 	if not res then print("Something went wrong: " .. msg) end
 end
 
