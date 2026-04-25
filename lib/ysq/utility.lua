@@ -1,5 +1,10 @@
 local utility = {}
 
+---Check if table is empty.
+---@param table table
+---@return boolean
+function utility.isTableEmpty(table) return type(next(table)) == "nil" end
+
 ---Does a nested compare on tables, uses == on non table values, untested.
 ---@param left table
 ---@param right table

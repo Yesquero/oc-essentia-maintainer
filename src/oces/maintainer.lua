@@ -119,7 +119,7 @@ end
 ---@return string
 function EssentiaMaintainer:showAspectList()
     local storedAspects = self.essentiaStorage:getAspects()
-    --return serialization.serialize(self.aspectList, true)
+
     local res = ""
     local cnt = 0
 

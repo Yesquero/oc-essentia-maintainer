@@ -105,6 +105,11 @@ local function testRefillAspects(ep, em)
     local res, time, msg = ep:refillAspects(missingAspects)
     assert(res == false and msg == "Database has no Item with required aspects." and time == 0)
 
+    em:addAspect("Potentia", 10)
+    res, time, msg = ep:refillAspects(em:getMissingAspects())
+    assert(res == false and msg == "No Aspects missing." and time == 0)
+    em:deleteAspect("Potentia")
+
     missingAspects = {
         Vitium = 800,
         Ignis = 100,
