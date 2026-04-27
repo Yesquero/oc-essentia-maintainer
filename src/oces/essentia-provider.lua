@@ -1,3 +1,4 @@
+local AdvancedSmelter = require("oces.impl.advanced-smelter")
 local Class = require("ysq.class")
 local MEItemSource = require("oces.impl.me-item-source")
 local SBSmeltery = require("oces.impl.sb-smeltery")
@@ -60,11 +61,13 @@ end
 local typeNewLookup = {
     [constants.SmelterType.EssentiaSmeltery] = SBSmeltery.new,
     [constants.ItemSourceType.ExportBus] = MEItemSource.new,
+    [constants.SmelterType.AdvancedAlchemicalSmelter] = AdvancedSmelter.new,
 }
 
 local typeSelfLookup = {
     [constants.SmelterType.EssentiaSmeltery] = SBSmeltery,
     [constants.ItemSourceType.ExportBus] = MEItemSource,
+    [constants.SmelterType.AdvancedAlchemicalSmelter] = AdvancedSmelter,
 }
 
 function EssentiaProvider:readConfig()
@@ -75,6 +78,7 @@ function EssentiaProvider:readConfig()
 
     local smeltery = typeNewLookup[epConfig.smelterType](
         typeSelfLookup[epConfig.smelterType],
+        ---@diagnostic disable-next-line:param-type-mismatch
         component.proxy(epConfig.smelterAdapterID),
         epConfig.efficiency,
         epConfig.essentiaPerSecond
@@ -108,13 +112,13 @@ function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSou
 ---@return integer?
 ---@return string?
 function EssentiaProvider:refillAspects(missingAspects)
-    if util.isTableEmpty(missingAspects) then return false, 0, "No Aspects missing." end
+    if util.isTableEmpty(missingAspects) then return false, 0, "No Aspects missing;" end
 
     local dbSlot = self:findItemStackToSmelt(missingAspects)
-    if not dbSlot then return false, 0, "Database has no Item with required aspects." end
+    if not dbSlot then return false, 0, "Database has no Item with required aspects;" end
 
     if not self.itemSource:isSmelterAvailable() then
-        return false, 0, "Essentia Smelter is unavailable / proccessing items."
+        return false, 0, "Essentia Smelter is unavailable / proccessing items;"
     end
 
     local amount = 0
@@ -126,7 +130,7 @@ function EssentiaProvider:refillAspects(missingAspects)
     if res then
         return true,
             time,
-            string.format("(Requested)/(Actual): %i / %i %s(s) inserted.", amount, res, self.ItemDB.items[dbSlot].label)
+            string.format("(Requested)/(Actual): %i / %i %s(s) inserted;", amount, res, self.ItemDB.items[dbSlot].label)
     else
         return false, 0, msg
     end

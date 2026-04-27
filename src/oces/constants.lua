@@ -1,5 +1,5 @@
 local constants = {
-    version = "0.9.5",
+    version = "0.9.6",
     defaultCfgPath = "/etc/oces.cfg",
     defaultRecordsPath = "/etc/oces-records.txt",
     defaultEPConfigPath = "/etc/oces-ep.cfg",
@@ -13,7 +13,7 @@ local constants = {
 local SmelterType = {
     Default = "Default",
     EssentiaSmeltery = "EssentiaSmeltery",
-    AdvancedAlchemicalConstruct = "AdvancedAlchemicalConstruct",
+    AdvancedAlchemicalSmelter = "AdvancedAlchemicalSmelter",
 }
 setmetatable(SmelterType, {
     __index = function(table, index) error("Invalid SmelterType") end,

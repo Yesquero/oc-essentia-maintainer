@@ -1,3 +1,4 @@
+local advanced_smelter = require("oc-mock.advanced-smelter")
 local database = require("oc-mock.database")
 local me_exportbus = require("oc-mock.me-export-bus")
 local me_interface = require("oc-mock.me_interface")
@@ -15,6 +16,8 @@ local component = {
     ---@type MEInterface
     me_interface = me_interface,
     smeltery = smeltery,
+    ---@type CompAdvSmelter
+    advanced_smelter = advanced_smelter,
 }
 
 ---Return component with given id.

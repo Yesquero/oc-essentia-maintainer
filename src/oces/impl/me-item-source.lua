@@ -78,7 +78,7 @@ function ExportBusIS:clearBusConfig() return self.exportBus.setExportConfigurati
 
 ---Check if associated Essentia Smelter can accepts items.
 ---@return boolean
-function ExportBusIS:isSmelterAvailable() return self.smeltery:isAvailable() end
+function ExportBusIS:isSmelterAvailable() return self.smeltery:canAcceptItems() end
 
 ---Attempt to insert specified amount of items into the Essentia Smelter. Takes efficiency, stack size and number of Acceleration Cards into account.
 ---Returns amount of items inserted, anticipated time(sec) before smelter becomes available and optional error string.

@@ -6,6 +6,7 @@ local testConstants = {
     dbDataFile = "resource/data/db_dump.txt",
     getAspectsDataFile = "resource/data/getAspects.txt",
     epConfigPath = "test/data/oces-ep.cfg",
+    epConfigPathAlt = "test/data/oces-ep-alt.cfg",
     databaseID = "ab142877-2995-479c-b1e6-363146c898d0",
     validExportSide = 4,
 }
@@ -20,7 +21,19 @@ local EPConfig = {
     sourceAdapterID = "4f177b1e-a237-4cf7-b353-c63fd363a1e0",
     interfaceAdaptedID = "7363a082-6765-45f4-8a48-a5d57692a581",
 }
-testConstants.epConfig = EPConfig
+testConstants.epCfg = EPConfig
+
+local EPConfigAlt = {
+    efficiency = 1,
+    accelerationCards = 3,
+    sourceType = "ExportBus",
+    smelterType = "AdvancedAlchemicalSmelter",
+    essentiaPerSecond = 6.0,
+    smelterAdapterID = "ec6b45a0-41c3-4269-97fb-433bebb92db6",
+    sourceAdapterID = "4f177b1e-a237-4cf7-b353-c63fd363a1e0",
+    interfaceAdaptedID = "7363a082-6765-45f4-8a48-a5d57692a581",
+}
+testConstants.epCfgAlt = EPConfigAlt
 
 testConstants.expectedDBItems = {
     { label = "Clear Glass", aspects = { Vitreus = 5 }, totalAspects = 5 },

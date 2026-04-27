@@ -7,6 +7,8 @@ local IItemSource = Class:inherit()
 ---@type ItemDB
 IItemSource.ItemDB = nil
 IItemSource.type = constants.ItemSourceType.Default
+---@type SBSmeltery | AdvancedSmelter
+IItemSource.smeltery = nil
 
 ---Check is smelter associated with this item source is available.
 ---@return boolean

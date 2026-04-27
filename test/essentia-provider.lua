@@ -11,14 +11,16 @@ local component = require("component")
 local essentiaProviderTest = {}
 
 component.proxy = function(uuid)
-    if uuid == testConstants.epConfig.interfaceAdaptedID then
+    if uuid == testConstants.epCfg.interfaceAdaptedID then
         return component.me_interface
-    elseif uuid == testConstants.epConfig.smelterAdapterID then
+    elseif uuid == testConstants.epCfg.smelterAdapterID then
         return component.smeltery
-    elseif uuid == testConstants.epConfig.sourceAdapterID then
+    elseif uuid == testConstants.epCfg.sourceAdapterID then
         return component.me_exportbus
     elseif uuid == testConstants.databaseID then
         return component.database
+    elseif uuid == testConstants.epCfgAlt.smelterAdapterID then
+        return component.advanced_smelter
     else
         error("Invalid uuid")
     end
@@ -98,16 +100,21 @@ end
 
 ---@param ep EssentiaProvider
 ---@param em EssentiaMaintainer
-local function testRefillAspects(ep, em)
+---@param expected table
+local function testRefillAspects(ep, em, expected)
+    local asserWrapper = function(res, time, msg, ind)
+        assert(res == expected[ind].res and time == expected[ind].time and msg == expected[ind].msg)
+    end
+
     local missingAspects = {
         InvalidAspect = -1,
     }
     local res, time, msg = ep:refillAspects(missingAspects)
-    assert(res == false and msg == "Database has no Item with required aspects." and time == 0)
+    asserWrapper(res, time, msg, 1)
 
     em:addAspect("Potentia", 10)
     res, time, msg = ep:refillAspects(em:getMissingAspects())
-    assert(res == false and msg == "No Aspects missing." and time == 0)
+    asserWrapper(res, time, msg, 2)
     em:deleteAspect("Potentia")
 
     missingAspects = {
@@ -117,12 +124,14 @@ local function testRefillAspects(ep, em)
         Perditio = 50,
     }
     component.smeltery.available = false
+    component.advanced_smelter.aspects = { Aer = 15 }
     res, time, msg = ep:refillAspects(missingAspects)
-    assert(res == false and msg == "Essentia Smelter is unavailable / proccessing items." and time == 0)
+    asserWrapper(res, time, msg, 3)
     component.smeltery.available = true
+    component.advanced_smelter.aspects = {}
 
     res, time, msg = ep:refillAspects(missingAspects)
-    assert(res == true and msg == "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted." and time == 555)
+    asserWrapper(res, time, msg, 4)
 
     missingAspects = {
         Aer = 1000,
@@ -131,14 +140,31 @@ local function testRefillAspects(ep, em)
         Sonus = 100,
     }
     res, time, msg = ep:refillAspects(missingAspects)
-    assert(res == true and msg == "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted." and time == 640)
+    asserWrapper(res, time, msg, 5)
 
     em:addAspect("Machina", 231)
     em:addAspect("Metallum", 10)
     res, time, msg = ep:refillAspects(em:getMissingAspects())
-    assert(res == true and msg == "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted." and time == 107)
+    asserWrapper(res, time, msg, 6)
 
     print("essentiaProvider.testRefillAspects complete")
+end
+
+---@param ep EssentiaProvider
+local function testConfig(ep, cfg)
+    ---@diagnostic disable-next-line:undefined-field
+    assert(ep.itemSource.smeltery.type == cfg.smelterType)
+    ---@diagnostic disable-next-line:undefined-field
+    assert(ep.itemSource.smeltery.efficiency == cfg.efficiency)
+    assert(ep.itemSource.type == cfg.sourceType)
+    ---@diagnostic disable-next-line:undefined-field
+    assert(ep.itemSource.accelerationCardNum == cfg.accelerationCards)
+    ---@diagnostic disable-next-line:undefined-field
+    assert(ep.itemSource.smeltery.essentiaPerSecond == cfg.essentiaPerSecond)
+    ---@diagnostic disable-next-line:undefined-field
+    assert(ep.itemSource.exportSide == testConstants.validExportSide)
+
+    print("essentiaProvider.testConfig complete")
 end
 
 function essentiaProviderTest.integrationTest()
@@ -148,24 +174,76 @@ function essentiaProviderTest.integrationTest()
 
     ---@type EssentiaProvider
     local ep = EssentiaProvider:new(itemDB, testConstants.epConfigPath)
+    component.me_exportbus.accCards = testConstants.epCfg.accelerationCards
 
-    ---@diagnostic disable-next-line:undefined-field
-    assert(ep.itemSource.smeltery.type == testConstants.epConfig.smelterType)
-    ---@diagnostic disable-next-line:undefined-field
-    assert(ep.itemSource.smeltery.efficiency == testConstants.epConfig.efficiency)
-    assert(ep.itemSource.type == testConstants.epConfig.sourceType)
-    ---@diagnostic disable-next-line:undefined-field
-    assert(ep.itemSource.accelerationCardNum == testConstants.epConfig.accelerationCards)
-    ---@diagnostic disable-next-line:undefined-field
-    assert(ep.itemSource.exportSide == testConstants.validExportSide)
-
+    testConfig(ep, testConstants.epCfg)
     testFindItemStack(ep)
     testFindAspectSource(ep)
 
     local MockEs = MockEssentiaStorage:new()
     local Maintainer = EssentiaMaintainer:new(MockEs, testConstants.cfgPath)
 
-    testRefillAspects(ep, Maintainer)
+    local expected = {
+        [1] = {
+            res = false,
+            time = 0,
+            msg = "Database has no Item with required aspects;",
+        },
+        [2] = {
+            res = false,
+            time = 0,
+            msg = "No Aspects missing;",
+        },
+        [3] = {
+            res = false,
+            time = 0,
+            msg = "Essentia Smelter is unavailable / proccessing items;",
+        },
+        [4] = {
+            res = true,
+            time = 555,
+            msg = "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted;",
+        },
+        [5] = {
+            res = true,
+            time = 640,
+            msg = "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted;",
+        },
+        [6] = {
+            res = true,
+            time = 107,
+            msg = "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted;",
+        },
+    }
+    testRefillAspects(ep, Maintainer, expected)
+
+    local epAlt = EssentiaProvider:new(itemDB, testConstants.epConfigPathAlt)
+    component.me_exportbus.accCards = testConstants.epCfgAlt.accelerationCards
+
+    testConfig(epAlt, testConstants.epCfgAlt)
+    testFindItemStack(epAlt)
+    testFindAspectSource(epAlt)
+
+    util.clearFile(testConstants.recordsPath, true)
+    Maintainer.aspectList = {}
+    Maintainer:rebuildLookup()
+
+    expected[4] = {
+        res = true,
+        time = 278,
+        msg = "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted;",
+    }
+    expected[5] = {
+        res = true,
+        time = 427,
+        msg = "(Requested)/(Actual): 67 / 128 Blitz Rod(s) inserted;",
+    }
+    expected[6] = {
+        res = true,
+        time = 54,
+        msg = "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted;",
+    }
+    testRefillAspects(epAlt, Maintainer, expected)
 
     print("essentiaProviderTest.integrationTest complete")
 end

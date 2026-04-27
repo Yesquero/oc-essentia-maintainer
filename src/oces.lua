@@ -33,7 +33,7 @@ local function deleteAspect(Maintainer, name)
 end
 
 ---@param Maintainer EssentiaMaintainer
-local function showAspects(Maintainer) print(Maintainer:showAspectList()) end
+local function showAspects(Maintainer) print(Maintainer:formattedAspectTable()) end
 
 ---@param Provider EssentiaProvider
 ---@param name string
@@ -52,25 +52,36 @@ end
 ---@param Maintainer EssentiaMaintainer
 ---@param Provider EssentiaProvider
 local function maintainerLoop(Maintainer, Provider)
+    local smelterType = Provider.itemSource.smeltery.type
+    local succes = "Refilling aspects: %s"
+    local wait = "Waiting for smelter to finish... ~%i sec"
+    local waitAlt = "Estimated smelting time: ~%i sec (not updating)"
     while true do
         term.clear()
-        print(Maintainer:showAspectList())
+        print(Maintainer:formattedAspectTable())
 
         local missingAspects = Maintainer:getMissingAspects()
 
         local res, time, msg = Provider:refillAspects(missingAspects)
-        if res then
+        if res and smelterType == constants.SmelterType.EssentiaSmeltery then
             local start = computer.uptime()
             while time > computer.uptime() - start do
                 term.clear()
-                print(Maintainer:showAspectList())
-                print(string.format("Refilling aspects: %s;", msg))
-                print(
-                    string.format(
-                        "Waiting for smelter to finish... ~%i sec",
-                        math.ceil(time - computer.uptime() + start)
-                    )
-                )
+                print(Maintainer:formattedAspectTable())
+                print(string.format(succes, msg))
+                print(string.format(wait, math.ceil(time - computer.uptime() + start)))
+
+                os.sleep(5)
+            end
+        elseif res and smelterType == constants.SmelterType.AdvancedAlchemicalSmelter then
+            local start = computer.uptime()
+            local estimate = string.format(waitAlt, time)
+            while not Provider.itemSource:isSmelterAvailable() do
+                term.clear()
+                print(Maintainer:formattedAspectTable())
+                print(string.format(succes, msg))
+                print(estimate)
+                print(string.format("Elapsed: ~%i sec", math.ceil(computer.uptime() - start)))
 
                 os.sleep(3)
             end
