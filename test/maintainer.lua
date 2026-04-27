@@ -110,6 +110,8 @@ function maintainerTest.showTest()
     maintainer:addAspect("Sonus", 1)
     maintainer:addAspect("Aer", 700)
     print(maintainer:formattedAspectTable())
+    maintainer:addAspect("Amogus", 300)
+    print(maintainer:formattedAspectTable())
 
     os.remove(testConstants.recordsPath)
 end

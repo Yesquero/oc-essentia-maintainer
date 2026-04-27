@@ -52,10 +52,8 @@ end
 ---@param Maintainer EssentiaMaintainer
 ---@param Provider EssentiaProvider
 local function maintainerLoop(Maintainer, Provider)
-    local smelterType = Provider.itemSource.smeltery.type
     local succes = "Refilling aspects: %s"
     local wait = "Waiting for smelter to finish... ~%i sec"
-    local waitAlt = "Estimated smelting time: ~%i sec (not updating)"
     while true do
         term.clear()
         print(Maintainer:formattedAspectTable())
@@ -63,7 +61,7 @@ local function maintainerLoop(Maintainer, Provider)
         local missingAspects = Maintainer:getMissingAspects()
 
         local res, time, msg = Provider:refillAspects(missingAspects)
-        if res and smelterType == constants.SmelterType.EssentiaSmeltery then
+        if res then
             local start = computer.uptime()
             while time > computer.uptime() - start do
                 term.clear()
@@ -72,18 +70,6 @@ local function maintainerLoop(Maintainer, Provider)
                 print(string.format(wait, math.ceil(time - computer.uptime() + start)))
 
                 os.sleep(5)
-            end
-        elseif res and smelterType == constants.SmelterType.AdvancedAlchemicalSmelter then
-            local start = computer.uptime()
-            local estimate = string.format(waitAlt, time)
-            while not Provider.itemSource:isSmelterAvailable() do
-                term.clear()
-                print(Maintainer:formattedAspectTable())
-                print(string.format(succes, msg))
-                print(estimate)
-                print(string.format("Elapsed: ~%i sec", math.ceil(computer.uptime() - start)))
-
-                os.sleep(3)
             end
         else
             print("Unable to refill aspects: " .. msg)

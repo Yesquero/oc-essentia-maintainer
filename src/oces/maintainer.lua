@@ -123,12 +123,12 @@ function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
     local res = "ASPECTS: Actual / Desired\n"
-    local header = string.rep("-", (7 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow)
+    local header = string.rep("-", (7 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow - 1)
     res = res .. header .. "\n"
     local cnt = 0
 
     for ind, val in ipairs(self.aspectList) do
-        cnt = cnt + 1
+        if cnt == 0 and ind ~= 1 then res = res .. "\n" end
 
         local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
         local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
@@ -145,9 +145,10 @@ function EssentiaMaintainer:formattedAspectTable()
                 secondNumPadding
             )
 
-        if cnt == printCfg.entriesPerRow then
-            res = res .. "\n"
+        if cnt == printCfg.entriesPerRow - 1 then
             cnt = 0
+        else
+            cnt = cnt + 1
         end
     end
 
