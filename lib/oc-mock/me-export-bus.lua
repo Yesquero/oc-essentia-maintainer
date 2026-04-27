@@ -1,7 +1,14 @@
 ---@class MEEBus
 local me_export_bus = {}
-me_export_bus.exportSize = 32
+me_export_bus.accCards = 0
 me_export_bus.validSide = 4
+
+local sizeLookup = {
+    [0] = 1,
+    [1] = 8,
+    [2] = 32,
+    [3] = 64,
+}
 
 ---Get the configuration of the export bus pointing in the specified direction.
 ---@param side number
@@ -39,7 +46,7 @@ end
 ---@return string?
 function me_export_bus.exportIntoSlot(side, slot)
     if side == me_export_bus.validSide then
-        return me_export_bus.exportSize
+        return sizeLookup[me_export_bus.accCards]
     else
         return nil
     end

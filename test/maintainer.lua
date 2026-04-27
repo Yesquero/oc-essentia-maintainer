@@ -43,16 +43,23 @@ function maintainerTest.unitTest()
 
     maintainer:addAspect("Metallum", 1000)
     maintainer:addAspect("Vitium", 100, 25)
-    assert(#maintainer.aspectList == 2 and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 1 }))
+    maintainer:addAspect("Aer", 25)
+    assert(
+        #maintainer.aspectList == 3
+            and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 3, Aer = 1 })
+    )
     assert(maintainer.aspectList[2].name == "Metallum")
 
     maintainer.aspectList = {}
     assert(#maintainer.aspectList == 0)
 
     maintainer:readRecords()
-    assert(#maintainer.aspectList == 2 and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 1 }))
-    assert(maintainer.aspectList[1].name == "Vitium")
-    assert(maintainer.aspectList[2].priority == maintainer.config.defaultPriority)
+    assert(
+        #maintainer.aspectList == 3
+            and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 3, Aer = 1 })
+    )
+    assert(maintainer.aspectList[2].name == "Metallum")
+    assert(maintainer.aspectList[1].priority == maintainer.config.defaultPriority)
 
     local res, msg = maintainer:deleteAspect("test")
     assert(not res)
@@ -60,8 +67,8 @@ function maintainerTest.unitTest()
     res = maintainer:deleteAspect("Vitium")
     assert(res)
     maintainer:readRecords()
-    assert(#maintainer.aspectList == 1 and util.compareTables(maintainer.aspectLookup, { Metallum = 1 }))
-    assert(maintainer.aspectList[1].name == "Metallum")
+    assert(#maintainer.aspectList == 2 and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Aer = 1 }))
+    assert(maintainer.aspectList[1].name == "Aer")
 
     print("maintainerTest.unitTest complete")
 end
@@ -102,7 +109,7 @@ function maintainerTest.showTest()
     maintainer:addAspect("Perditio", 10000)
     maintainer:addAspect("Sonus", 1)
     maintainer:addAspect("Aer", 700)
-    print(maintainer:showAspectList())
+    print(maintainer:formattedAspectTable())
 
     os.remove(testConstants.recordsPath)
 end

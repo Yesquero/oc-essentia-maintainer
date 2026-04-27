@@ -16,7 +16,7 @@ local function runTests()
     maintainerTest.testInit()
     maintainerTest.unitTest()
     maintainerTest.integrationTest()
-    --maintainerTest.showTest()
+    maintainerTest.showTest()
 
     itemDBTest.unitTest()
 

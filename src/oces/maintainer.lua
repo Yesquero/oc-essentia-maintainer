@@ -64,6 +64,7 @@ function EssentiaMaintainer:readRecords()
         "Error when reading records file: " .. self.config.recordsPath
     )
     file:close()
+    table.sort(self.aspectList, function(lhs, rhs) return lhs.name < rhs.name end)
 
     self:rebuildLookup()
 
@@ -86,6 +87,7 @@ function EssentiaMaintainer:addAspect(name, amount, priority)
         amount = amount,
         priority = priority or self.config.defaultPriority,
     }
+    table.sort(self.aspectList, function(lhs, rhs) return lhs.name < rhs.name end)
 
     self:saveRecords()
     self:rebuildLookup()
@@ -115,12 +117,14 @@ function EssentiaMaintainer:deleteAspect(name)
     return false, "Could not find saved aspect with matching name: " .. name
 end
 
----Returns stylized string representation of maintained aspects.
+---Returns stylized string representation of maintained aspects and their current amount.
 ---@return string
-function EssentiaMaintainer:showAspectList()
+function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
-    local res = ""
+    local res = "ASPECTS: Actual / Desired\n"
+    local header = string.rep("-", (7 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow)
+    res = res .. header .. "\n"
     local cnt = 0
 
     for ind, val in ipairs(self.aspectList) do
@@ -132,7 +136,7 @@ function EssentiaMaintainer:showAspectList()
 
         res = res
             .. string.format(
-                "%s:%s%s%i / %i%s; ",
+                "%s:%s%s%i / %i%s | ",
                 val.name,
                 namePadding,
                 firstNumPadding,
@@ -147,7 +151,7 @@ function EssentiaMaintainer:showAspectList()
         end
     end
 
-    return res
+    return res .. "\n" .. header
 end
 
 ---Save current list of maintained aspect to a file.
@@ -165,8 +169,8 @@ end
 function EssentiaMaintainer:rebuildLookup()
     self.aspectLookup = {}
 
-    local sortByPriority = function(left, right) return left.priority > right.priority end
-    table.sort(self.aspectList, sortByPriority)
+    -- local sortByPriority = function(left, right) return left.priority > right.priority end
+    -- table.sort(self.aspectList, sortByPriority)
 
     for i = 1, #self.aspectList do
         printCfg.maxAspLen = math.max(printCfg.maxAspLen, #self.aspectList[i].name)
