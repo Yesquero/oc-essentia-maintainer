@@ -118,6 +118,12 @@ local function testRefillAspects(ep, em, expected)
     em:deleteAspect("Potentia")
 
     missingAspects = {
+        Cognitio = 400,
+    }
+    res, time, msg = ep:refillAspects(missingAspects)
+    asserWrapper(res, time, msg, 3)
+
+    missingAspects = {
         Vitium = 800,
         Ignis = 100,
         Terra = 50,
@@ -126,12 +132,12 @@ local function testRefillAspects(ep, em, expected)
     component.smeltery.available = false
     component.advanced_smelter.aspects = { Aer = 15 }
     res, time, msg = ep:refillAspects(missingAspects)
-    asserWrapper(res, time, msg, 3)
+    asserWrapper(res, time, msg, 4)
     component.smeltery.available = true
     component.advanced_smelter.aspects = {}
 
     res, time, msg = ep:refillAspects(missingAspects)
-    asserWrapper(res, time, msg, 4)
+    asserWrapper(res, time, msg, 5)
 
     missingAspects = {
         Aer = 1000,
@@ -140,12 +146,24 @@ local function testRefillAspects(ep, em, expected)
         Sonus = 100,
     }
     res, time, msg = ep:refillAspects(missingAspects)
-    asserWrapper(res, time, msg, 5)
+    asserWrapper(res, time, msg, 6)
 
     em:addAspect("Machina", 231)
     em:addAspect("Metallum", 10)
     res, time, msg = ep:refillAspects(em:getMissingAspects())
-    asserWrapper(res, time, msg, 6)
+    asserWrapper(res, time, msg, 7)
+
+    missingAspects = {
+        Praemunio = 1000,
+    }
+    res, time, msg = ep:refillAspects(missingAspects)
+    asserWrapper(res, time, msg, 8)
+
+    missingAspects = {
+        Vitreus = 400,
+    }
+    res, time, msg = ep:refillAspects(missingAspects)
+    asserWrapper(res, time, msg, 9)
 
     print("essentiaProvider.testRefillAspects complete")
 end
@@ -187,7 +205,7 @@ function essentiaProviderTest.integrationTest()
         [1] = {
             res = false,
             time = 0,
-            msg = "Database has no Item with required aspects;",
+            msg = "Database has no Item with required aspects: {InvalidAspect=-1}",
         },
         [2] = {
             res = false,
@@ -197,22 +215,37 @@ function essentiaProviderTest.integrationTest()
         [3] = {
             res = false,
             time = 0,
-            msg = "Essentia Smelter is unavailable / proccessing items;",
+            msg = "ME network has no items with label: Oak Bookshelf",
         },
         [4] = {
+            res = false,
+            time = 0,
+            msg = "Essentia Smelter is unavailable / proccessing items;",
+        },
+        [5] = {
             res = true,
             time = 555,
             msg = "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted;",
         },
-        [5] = {
+        [6] = {
             res = true,
             time = 640,
             msg = "(Requested)/(Actual): 67 / 96 Blitz Rod(s) inserted;",
         },
-        [6] = {
+        [7] = {
             res = true,
             time = 107,
             msg = "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted;",
+        },
+        [8] = {
+            res = true,
+            time = 290,
+            msg = "(Requested)/(Actual): 50 / 10 Chain Chestplate(s) inserted;",
+        },
+        [9] = {
+            res = true,
+            time = 25,
+            msg = "(Requested)/(Actual): 80 / 15 Clear Glass(s) inserted;",
         },
     }
     testRefillAspects(ep, Maintainer, expected)
@@ -228,20 +261,30 @@ function essentiaProviderTest.integrationTest()
     Maintainer.aspectList = {}
     Maintainer:rebuildLookup()
 
-    expected[4] = {
+    expected[5] = {
         res = true,
         time = 278,
         msg = "(Requested)/(Actual): 100 / 128 Vishroom(s) inserted;",
     }
-    expected[5] = {
+    expected[6] = {
         res = true,
         time = 427,
         msg = "(Requested)/(Actual): 67 / 128 Blitz Rod(s) inserted;",
     }
-    expected[6] = {
+    expected[7] = {
         res = true,
         time = 54,
         msg = "(Requested)/(Actual): 47 / 64 Stone Gear(s) inserted;",
+    }
+    expected[8] = {
+        res = true,
+        time = 145,
+        msg = "(Requested)/(Actual): 50 / 10 Chain Chestplate(s) inserted;",
+    }
+    expected[9] = {
+        res = true,
+        time = 13,
+        msg = "(Requested)/(Actual): 80 / 15 Clear Glass(s) inserted;",
     }
     testRefillAspects(epAlt, Maintainer, expected)
 

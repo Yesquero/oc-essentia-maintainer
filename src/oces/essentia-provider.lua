@@ -103,7 +103,7 @@ end
 ---@param name string
 ---@param maxResults integer?
 ---@return { label: string, aspects: Aspects}[] | nil
----@retrun msg?
+---@retrun string?
 function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSource:findAspectSource(name, maxResults) end
 
 ---Attempts to use associated ItemSource to make missing aspects.
@@ -115,7 +115,9 @@ function EssentiaProvider:refillAspects(missingAspects)
     if util.isTableEmpty(missingAspects) then return false, 0, "No Aspects missing;" end
 
     local dbSlot = self:findItemStackToSmelt(missingAspects)
-    if not dbSlot then return false, 0, "Database has no Item with required aspects;" end
+    if not dbSlot then
+        return false, 0, "Database has no Item with required aspects: " .. serialization.serialize(missingAspects)
+    end
 
     if not self.itemSource:isSmelterAvailable() then
         return false, 0, "Essentia Smelter is unavailable / proccessing items;"

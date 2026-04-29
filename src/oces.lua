@@ -11,14 +11,24 @@ local constants = require("oces.constants")
 
 ---@param Maintainer EssentiaMaintainer
 ---@param name string
+local function addKnown(Maintainer, name)
+    local res, msg = Maintainer:addKnownAspect(name)
+    print(msg)
+end
+
+---@param Maintainer EssentiaMaintainer
+---@param name string
+local function deleteKnown(Maintainer, name)
+    local res, msg = Maintainer:deleteKnownAspect(name)
+    print(msg)
+end
+
+---@param Maintainer EssentiaMaintainer
+---@param name string
 ---@param amount integer
 local function addAspect(Maintainer, name, amount)
-    local res = Maintainer:addAspect(name, amount)
-    if res then
-        print("Added aspect: " .. name)
-    else
-        print("Could not add aspect: " .. name)
-    end
+    local res, msg = Maintainer:addAspect(name, amount)
+    print(msg)
 end
 
 ---@param Maintainer EssentiaMaintainer
@@ -69,11 +79,11 @@ local function maintainerLoop(Maintainer, Provider)
                 print(string.format(succes, msg))
                 print(string.format(wait, math.ceil(time - computer.uptime() + start)))
 
-                os.sleep(5)
+                os.sleep(Maintainer.config.refillPollingInterval)
             end
         else
             print("Unable to refill aspects: " .. msg)
-            os.sleep(Maintainer.config.pollingInterval)
+            os.sleep(Maintainer.config.mainPollingInterval)
         end
     end
 end
@@ -84,7 +94,9 @@ local function showHelp()
     Usage: oces [key] arg...
     Keys:
     --add <string> <integer>    Add Aspect to the list of maintained aspects.
+    --add-known <string>        Add Aspect to the list of known aspects.
     --delete <string>           Delete Aspect from the list of maintained aspects.
+    --delete-known <string>     Delete Aspect from the list of known aspects.
     --show                      Show list of maintained aspects.
     --find <string> <integer>   Find all items with the specified aspect, sorted by its amount. Second arg is max number of results.
     --start                     Start maintaining aspects, runs in foreground.
@@ -130,6 +142,16 @@ local function chooseFunction(args, ops)
         maintainerLoop(Maintainer, Provider)
     elseif ops.help then
         showHelp()
+    elseif ops["add-known"] then
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+
+        addKnown(Maintainer, args[1])
+    elseif ops["delete-known"] then
+        local EssentiaStorage = InfusionProvider:new(component.thaumicenergistics_infusion_provider)
+        local Maintainer = EssentiaMaintainer:new(EssentiaStorage)
+
+        deleteKnown(Maintainer, args[1])
     else
         error("Invalid programm options.")
     end

@@ -1,12 +1,16 @@
 local testConstants = {
-    cfgPath = "test/data/oces.cfg",
-    recordsPath = "test/data/oces-records.txt",
-    defaultPollingInterval = 5,
+    cfgPath = "test/data/maintainer.cfg",
+    recordsPath = "test/data/records.txt",
+    knownAspectsPath = "test/data/known-aspects.txt",
+    mainPollingInterval = 5,
+    refillPollingInterval = 2,
+    tableEntrierPerRow = 5,
+    tableMaxNumLen = 6,
     defaultPriority = 10,
     dbDataFile = "resource/data/db_dump.txt",
     getAspectsDataFile = "resource/data/getAspects.txt",
-    epConfigPath = "test/data/oces-ep.cfg",
-    epConfigPathAlt = "test/data/oces-ep-alt.cfg",
+    epConfigPath = "test/data/provider.cfg",
+    epConfigPathAlt = "test/data/provider-alt.cfg",
     databaseID = "ab142877-2995-479c-b1e6-363146c898d0",
     validExportSide = 4,
 }
@@ -51,6 +55,7 @@ testConstants.expectedDBItems = {
     { label = "Coal", aspects = { Potentia = 10, Ignis = 10 }, totalAspects = 20 },
     { label = "Bone", aspects = { Mortuus = 5, Victus = 5 }, totalAspects = 10 },
     { label = "Sunflower", aspects = { Herba = 5, Sensus = 5, Aer = 1, Victus = 1 }, totalAspects = 12 },
+    { label = "Chain Chestplate", aspects = { Praemunio = 20, Metallum = 67 }, totalAspects = 87 },
 }
 
 return testConstants

@@ -13,8 +13,6 @@ ExportBusIS.exportBus = nil
 ExportBusIS.smeltery = nil
 ---@type MEInterface
 ExportBusIS.meInterface = nil
----@type ItemDB
-ExportBusIS.database = nil
 ExportBusIS.exportSide = -1
 ExportBusIS.accelerationCardNum = 0
 
@@ -26,7 +24,7 @@ function ExportBusIS:initialize(itemDatabase, exportBus, smeltery, accelerationC
     assert(accelerationCardNum >= 0 and accelerationCardNum <= 3, "Invalid number of Acceleration Cards")
     self.exportBus = exportBus
     self.smeltery = smeltery
-    self.database = itemDatabase
+    self.itemDatabase = itemDatabase
     self.meInterface = meInterface
     self.accelerationCardNum = accelerationCardNum
 
@@ -41,7 +39,7 @@ end
 ---@return string?
 function ExportBusIS:setBusConfig(dbSlot)
     ---@diagnostic disable-next-line: param-type-mismatch
-    return self.exportBus.setExportConfiguration(self.exportSide, self.database:getComponent().address, dbSlot)
+    return self.exportBus.setExportConfiguration(self.exportSide, self.itemDatabase:getComponent().address, dbSlot)
 end
 
 -- Cant have 4 Acceleration Cards because Export bus has 4 slots and we use 1 Redstone Card.
@@ -89,9 +87,11 @@ function ExportBusIS:isSmelterAvailable() return self.smeltery:canAcceptItems() 
 ---@return string?
 function ExportBusIS:smeltItems(dbSlot, amount)
     local found = self.meInterface.getItemsInNetwork({
-        label = self.database.items[dbSlot].label,
+        label = self.itemDatabase.items[dbSlot].label,
     })
-    if not found[1] then return nil, 0, "ME network has no items with label: " .. self.database.items[dbSlot].label end
+    if not found[1] then
+        return nil, 0, "ME network has no items with label: " .. self.itemDatabase.items[dbSlot].label
+    end
 
     local res, msg = self:clearBusConfig()
     if not res then return nil, 0, msg end
@@ -102,21 +102,13 @@ function ExportBusIS:smeltItems(dbSlot, amount)
     local totalInserted = 0
     for i = 1, self:calculateExportOps(amount, found[1].maxSize) do
         local res, msg = self.exportBus.exportIntoSlot(self.exportSide)
-        if not res then
-            return res,
-                calculateWaitTime(
-                    totalInserted,
-                    self.ItemDB.items[dbSlot].totalAspects,
-                    self.smeltery.essentiaPerSecond
-                ),
-                msg
-        end
+        if not res and totalInserted == 0 then return res, 0, msg end
 
-        totalInserted = totalInserted + res
+        totalInserted = totalInserted + (res or 0)
     end
 
     return totalInserted,
-        calculateWaitTime(totalInserted, self.database.items[dbSlot].totalAspects, self.smeltery.essentiaPerSecond)
+        calculateWaitTime(totalInserted, self.itemDatabase.items[dbSlot].totalAspects, self.smeltery.essentiaPerSecond)
 end
 
 ---Attempts to find ItemStacks with specified aspect.

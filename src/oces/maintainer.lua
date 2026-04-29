@@ -8,14 +8,16 @@ local util = require("ysq.utility")
 ---@class MaintainerConfig
 local config = {
     defaultPriority = constants.defaultPriority,
-    pollingInterval = constants.defaultPollingInterval,
+    mainPollingInterval = constants.mainPollingInterval,
+    refillPollingInterval = constants.refillPollingInterval,
+    tableMaxNumLen = constants.tableMaxNumLen,
+    tableEntrierPerRow = constants.tableEntrierPerRow,
     recordsPath = constants.defaultRecordsPath,
+    knownAspectsPath = constants.defaultKnownAspectsPath,
 }
 
 local printCfg = {
     maxAspLen = 0,
-    maxNumLen = 5,
-    entriesPerRow = 4,
 }
 
 ---@class EssentiaMaintainer: AbstractClass
@@ -24,6 +26,7 @@ local printCfg = {
 ---@field configPath string
 ---@field config MaintainerConfig
 ---@field essentiaStorage IEssentiaStorage
+---@field knownAspects { [string]: boolean}
 ---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit({
     aspectList = {},
@@ -31,6 +34,7 @@ local EssentiaMaintainer = Class:inherit({
     configPath = constants.defaultCfgPath,
     config = config,
     essentiaStorage = nil,
+    knownAspects = {},
 })
 
 ---@param path string
@@ -52,7 +56,6 @@ function EssentiaMaintainer:readConfig()
 end
 
 ---Read list of aspects to maintain from a file.
----TODO: handle empty file case
 ---@return boolean
 function EssentiaMaintainer:readRecords()
     if not filesystem.exists(self.config.recordsPath) then createBlankRecords(self.config.recordsPath) end
@@ -71,28 +74,93 @@ function EssentiaMaintainer:readRecords()
     return true
 end
 
+---Read list of known aspects from a file.
+---@return boolean
+function EssentiaMaintainer:readKnwonAspects()
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "r"),
+        "Could not open known aspects file: " .. self.config.knownAspectsPath
+    )
+    self.knownAspects =
+        assert(serialization.unserialize(file:read("a")), "Parsing error: " .. self.config.knownAspectsPath)
+    file:close()
+    return true
+end
+
+---Add aspect to the list of knwon aspects, save it to file.
+---@param name string
+---@return boolean
+---@return string
+function EssentiaMaintainer:addKnownAspect(name)
+    assert(name and type(name) == "string")
+    if self.knownAspects[name] then return false, "Aspect already in knwon aspects list: " .. name end
+
+    self.knownAspects[name] = true
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "w"),
+        "Could not open knwon aspects file: " .. self.config.knownAspectsPath
+    )
+    assert(file:write(serialization.serialize(self.knownAspects)))
+    file:close()
+
+    return true, string.format("Added %s to the list of known aspects.", name)
+end
+
+---Delete aspect from the list of knwon aspects, save it to file.
+---@param name string
+---@return boolean
+---@return string
+function EssentiaMaintainer:deleteKnownAspect(name)
+    assert(name and type(name) == "string")
+    if not self.knownAspects[name] then return false, "No such aspect in known aspects list: " .. name end
+
+    self.knownAspects[name] = nil
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "w"),
+        "Could not open knwon aspects file: " .. self.config.knownAspectsPath
+    )
+    assert(file:write(serialization.serialize(self.knownAspects)))
+    file:close()
+
+    return true, string.format("Deleted %s from the list of known aspects.", name)
+end
+
 ---Add an aspect to list of aspect to maintain, uses default priority from config if none given.
 ---TODO: add check against a list of known aspects
 ---@param name string
 ---@param amount integer
 ---@param priority integer?
 ---@return boolean
+---@return string
 function EssentiaMaintainer:addAspect(name, amount, priority)
     assert(name and type(name) == "string", "addAspect invalid argument(s)")
     assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
 
+    if not self.knownAspects[name] then
+        return false, string.format("Unknown aspect: %s; Check spelling or add it to the list of known aspects.", name)
+    end
+
+    local msg = "Added aspect: "
+
     self:readRecords()
-    self.aspectList[#self.aspectList + 1] = {
-        name = name,
-        amount = amount,
-        priority = priority or self.config.defaultPriority,
-    }
+
+    if self.aspectLookup[name] then
+        self.aspectList[self.aspectLookup[name]].amount = amount
+        msg = "Updated aspect: "
+    else
+        self.aspectList[#self.aspectList + 1] = {
+            name = name,
+            amount = amount,
+            priority = priority or self.config.defaultPriority,
+        }
+    end
+
     table.sort(self.aspectList, function(lhs, rhs) return lhs.name < rhs.name end)
 
     self:saveRecords()
     self:rebuildLookup()
 
-    return true
+    return true, msg .. name
 end
 
 ---Delete aspect with given name from the list of aspects to maintain.
@@ -123,7 +191,8 @@ function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
     local res = "ASPECTS: Actual / Desired\n"
-    local header = string.rep("-", (7 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow - 1)
+    local header =
+        string.rep("-", (8 + printCfg.maxAspLen + self.config.tableMaxNumLen * 2) * self.config.tableEntrierPerRow - 1)
     res = res .. header .. "\n"
     local cnt = 0
 
@@ -131,12 +200,15 @@ function EssentiaMaintainer:formattedAspectTable()
         if cnt == 0 and ind ~= 1 then res = res .. "\n" end
 
         local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
-        local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
-        local secondNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(val.amount))
+        local firstNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(storedAspects[val.name] or 0))
+        local secondNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(val.amount))
+        local mark = "-"
+        if (storedAspects[val.name] or 0) >= val.amount then mark = "+" end
 
         res = res
             .. string.format(
-                "%s:%s%s%i / %i%s | ",
+                "%s%s:%s%s%i / %i%s | ",
+                mark,
                 val.name,
                 namePadding,
                 firstNumPadding,
@@ -145,7 +217,7 @@ function EssentiaMaintainer:formattedAspectTable()
                 secondNumPadding
             )
 
-        if cnt == printCfg.entriesPerRow - 1 then
+        if cnt == self.config.tableEntrierPerRow - 1 then
             cnt = 0
         else
             cnt = cnt + 1
@@ -185,6 +257,7 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
     self.essentiaStorage = essentiaStorage
     self:readConfig()
     self:readRecords()
+    self:readKnwonAspects()
 end
 
 ---Returns a dict of missing aspects.

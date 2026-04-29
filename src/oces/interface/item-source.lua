@@ -5,7 +5,7 @@ local constants = require("oces.constants")
 local IItemSource = Class:inherit()
 
 ---@type ItemDB
-IItemSource.ItemDB = nil
+IItemSource.itemDatabase = nil
 IItemSource.type = constants.ItemSourceType.Default
 ---@type SBSmeltery | AdvancedSmelter
 IItemSource.smeltery = nil
