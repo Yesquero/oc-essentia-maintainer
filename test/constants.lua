@@ -51,6 +51,7 @@ testConstants.expectedDBItems = {
     { label = "Coal", aspects = { Potentia = 10, Ignis = 10 }, totalAspects = 20 },
     { label = "Bone", aspects = { Mortuus = 5, Victus = 5 }, totalAspects = 10 },
     { label = "Sunflower", aspects = { Herba = 5, Sensus = 5, Aer = 1, Victus = 1 }, totalAspects = 12 },
+    { label = "Chain Chestplate", aspects = { Praemunio = 20, Metallum = 67 }, totalAspects = 87 },
 }
 
 return testConstants

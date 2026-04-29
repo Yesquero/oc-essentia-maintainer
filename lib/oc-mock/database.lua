@@ -2,6 +2,7 @@ local mockConstants = require("oc-mock.constants")
 local serialization = require("serialization")
 
 ---@class DatabaseComponent
+---@field address string
 local database = {
     type = "database",
     dummyData = {},

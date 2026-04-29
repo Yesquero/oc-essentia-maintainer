@@ -31,15 +31,17 @@ end
 ---@return table
 function me_interface.getItemsInNetwork(filter)
     local data = loadData()
+    local res = {}
     if not filter then
-        return data
-    else
-        local res = {}
-        for ind, val in ipairs(data) do
-            if flter(filter, val) then res[#res + 1] = val end
+        for ind, val in pairs(data) do
+            if val.size > 0 then res[#res + 1] = val end
         end
-        return res
+    else
+        for ind, val in ipairs(data) do
+            if val.size > 0 and flter(filter, val) then res[#res + 1] = val end
+        end
     end
+    return res
 end
 
 return me_interface
