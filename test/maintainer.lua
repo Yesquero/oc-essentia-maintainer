@@ -32,7 +32,10 @@ function maintainerTest.unitTest()
     local maintainer = EssentiaMaintainer:new(nil, testConstants.cfgPath)
     assert(util.compareTables(maintainer.config, {
         defaultPriority = testConstants.defaultPriority,
-        pollingInterval = testConstants.defaultPollingInterval,
+        mainPollingInterval = testConstants.mainPollingInterval,
+        refillPollingInterval = testConstants.refillPollingInterval,
+        tableMaxNumLen = testConstants.tableMaxNumLen,
+        tableEntrierPerRow = testConstants.tableEntrierPerRow,
         recordsPath = testConstants.recordsPath,
     }))
 
@@ -119,6 +122,7 @@ function maintainerTest.showTest()
     maintainer:addAspect("Vitium", 1000)
     maintainer:addAspect("Ordo", 500)
     maintainer:addAspect("Perditio", 10000)
+    maintainer:addAspect("Celes", 10000)
     maintainer:addAspect("Sonus", 1)
     maintainer:addAspect("Aer", 700)
     print(maintainer:formattedAspectTable())

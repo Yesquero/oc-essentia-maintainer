@@ -65,11 +65,11 @@ local function maintainerLoop(Maintainer, Provider)
                 print(string.format(succes, msg))
                 print(string.format(wait, math.ceil(time - computer.uptime() + start)))
 
-                os.sleep(5)
+                os.sleep(Maintainer.config.refillPollingInterval)
             end
         else
             print("Unable to refill aspects: " .. msg)
-            os.sleep(Maintainer.config.pollingInterval)
+            os.sleep(Maintainer.config.mainPollingInterval)
         end
     end
 end

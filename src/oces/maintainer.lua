@@ -8,14 +8,15 @@ local util = require("ysq.utility")
 ---@class MaintainerConfig
 local config = {
     defaultPriority = constants.defaultPriority,
-    pollingInterval = constants.defaultPollingInterval,
+    mainPollingInterval = constants.mainPollingInterval,
+    refillPollingInterval = constants.refillPollingInterval,
+    tableMaxNumLen = constants.tableMaxNumLen,
+    tableEntrierPerRow = constants.tableEntrierPerRow,
     recordsPath = constants.defaultRecordsPath,
 }
 
 local printCfg = {
     maxAspLen = 0,
-    maxNumLen = 5,
-    entriesPerRow = 4,
 }
 
 ---@class EssentiaMaintainer: AbstractClass
@@ -133,7 +134,8 @@ function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
     local res = "ASPECTS: Actual / Desired\n"
-    local header = string.rep("-", (8 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow - 1)
+    local header =
+        string.rep("-", (8 + printCfg.maxAspLen + self.config.tableMaxNumLen * 2) * self.config.tableEntrierPerRow - 1)
     res = res .. header .. "\n"
     local cnt = 0
 
@@ -141,8 +143,8 @@ function EssentiaMaintainer:formattedAspectTable()
         if cnt == 0 and ind ~= 1 then res = res .. "\n" end
 
         local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
-        local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
-        local secondNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(val.amount))
+        local firstNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(storedAspects[val.name] or 0))
+        local secondNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(val.amount))
         local mark = "-"
         if (storedAspects[val.name] or 0) >= val.amount then mark = "+" end
 
@@ -158,7 +160,7 @@ function EssentiaMaintainer:formattedAspectTable()
                 secondNumPadding
             )
 
-        if cnt == printCfg.entriesPerRow - 1 then
+        if cnt == self.config.tableEntrierPerRow - 1 then
             cnt = 0
         else
             cnt = cnt + 1
