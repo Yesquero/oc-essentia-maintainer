@@ -123,7 +123,7 @@ function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
     local res = "ASPECTS: Actual / Desired\n"
-    local header = string.rep("-", (7 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow - 1)
+    local header = string.rep("-", (8 + printCfg.maxAspLen + printCfg.maxNumLen * 2) * printCfg.entriesPerRow - 1)
     res = res .. header .. "\n"
     local cnt = 0
 
@@ -133,10 +133,13 @@ function EssentiaMaintainer:formattedAspectTable()
         local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
         local firstNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(storedAspects[val.name] or 0))
         local secondNumPadding = string.rep(" ", printCfg.maxNumLen - #tostring(val.amount))
+        local mark = "-"
+        if (storedAspects[val.name] or 0) >= val.amount then mark = "+" end
 
         res = res
             .. string.format(
-                "%s:%s%s%i / %i%s | ",
+                "%s%s:%s%s%i / %i%s | ",
+                mark,
                 val.name,
                 namePadding,
                 firstNumPadding,
