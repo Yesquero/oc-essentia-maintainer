@@ -1,8 +1,9 @@
 local constants = {
-    version = "0.9.8",
+    version = "0.9.71",
     defaultCfgPath = "/etc/oces/maintainer.cfg",
     defaultRecordsPath = "/etc/oces/records.txt",
     defaultEPConfigPath = "/etc/oces/provider.cfg",
+    defaultKnownAspectsPath = "/etc/oces/known-aspects.txt",
     defaultPriority = 0,
     mainPollingInterval = 10,
     refillPollingInterval = 5,

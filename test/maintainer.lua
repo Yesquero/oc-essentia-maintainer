@@ -25,6 +25,13 @@ function maintainerTest.testInit()
     print("maintainerTest.testInit complete")
 end
 
+local function getKnownAspects(path)
+    local file = assert(io.open(path, "r"))
+    local res = assert(serialization.unserialize(file:read("a")))
+    file:close()
+    return res
+end
+
 function maintainerTest.unitTest()
     os.remove(testConstants.recordsPath)
 
@@ -37,9 +44,34 @@ function maintainerTest.unitTest()
         tableMaxNumLen = testConstants.tableMaxNumLen,
         tableEntrierPerRow = testConstants.tableEntrierPerRow,
         recordsPath = testConstants.recordsPath,
+        knownAspectsPath = testConstants.knownAspectsPath,
     }))
 
+    local knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    assert(util.compareTables(maintainer.knownAspects, knwonAspects))
+
     util.clearFile(maintainer.config.recordsPath, true)
+
+    local res, msg = maintainer:addAspect("Invalid", -1)
+    assert(not res and msg == "Unknown aspect: Invalid; Check spelling or add it to the list of known aspects.")
+    assert(#maintainer.aspectList == 0)
+
+    res, msg = maintainer:addKnownAspect("Aer")
+    assert(not res and msg == "Aspect already in knwon aspects list: Aer")
+
+    res, msg = maintainer:deleteKnownAspect("Invalid")
+    assert(not res and msg == "No such aspect in known aspects list: Invalid")
+
+    local newAspect = "Celes"
+    res, msg = maintainer:addKnownAspect(newAspect)
+    knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    assert(res and msg == string.format("Added %s to the list of known aspects.", newAspect))
+    assert(maintainer.knownAspects[newAspect] and knwonAspects[newAspect])
+
+    res, msg = maintainer:deleteKnownAspect(newAspect)
+    knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    assert(res and msg == string.format("Deleted %s from the list of known aspects.", newAspect))
+    assert(not maintainer.knownAspects[newAspect] and not knwonAspects[newAspect])
 
     maintainer:readRecords()
     assert(#maintainer.aspectList == 0)
@@ -64,7 +96,7 @@ function maintainerTest.unitTest()
     assert(maintainer.aspectList[2].name == "Metallum")
     assert(maintainer.aspectList[1].priority == maintainer.config.defaultPriority)
 
-    local res, msg = maintainer:deleteAspect("test")
+    res, msg = maintainer:deleteAspect("test")
     assert(not res)
 
     res = maintainer:deleteAspect("Vitium")

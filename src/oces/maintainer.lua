@@ -13,6 +13,7 @@ local config = {
     tableMaxNumLen = constants.tableMaxNumLen,
     tableEntrierPerRow = constants.tableEntrierPerRow,
     recordsPath = constants.defaultRecordsPath,
+    knownAspectsPath = constants.defaultKnownAspectsPath,
 }
 
 local printCfg = {
@@ -25,6 +26,7 @@ local printCfg = {
 ---@field configPath string
 ---@field config MaintainerConfig
 ---@field essentiaStorage IEssentiaStorage
+---@field knownAspects { [string]: boolean}
 ---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit({
     aspectList = {},
@@ -32,6 +34,7 @@ local EssentiaMaintainer = Class:inherit({
     configPath = constants.defaultCfgPath,
     config = config,
     essentiaStorage = nil,
+    knownAspects = {},
 })
 
 ---@param path string
@@ -53,7 +56,6 @@ function EssentiaMaintainer:readConfig()
 end
 
 ---Read list of aspects to maintain from a file.
----TODO: handle empty file case
 ---@return boolean
 function EssentiaMaintainer:readRecords()
     if not filesystem.exists(self.config.recordsPath) then createBlankRecords(self.config.recordsPath) end
@@ -72,6 +74,57 @@ function EssentiaMaintainer:readRecords()
     return true
 end
 
+---Read list of known aspects from a file.
+---@return boolean
+function EssentiaMaintainer:readKnwonAspects()
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "r"),
+        "Could not open known aspects file: " .. self.config.knownAspectsPath
+    )
+    self.knownAspects =
+        assert(serialization.unserialize(file:read("a")), "Parsing error: " .. self.config.knownAspectsPath)
+    file:close()
+    return true
+end
+
+---Add aspect to the list of knwon aspects, save it to file.
+---@param name string
+---@return boolean
+---@return string
+function EssentiaMaintainer:addKnownAspect(name)
+    assert(name and type(name) == "string")
+    if self.knownAspects[name] then return false, "Aspect already in knwon aspects list: " .. name end
+
+    self.knownAspects[name] = true
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "w"),
+        "Could not open knwon aspects file: " .. self.config.knownAspectsPath
+    )
+    assert(file:write(serialization.serialize(self.knownAspects)))
+    file:close()
+
+    return true, string.format("Added %s to the list of known aspects.", name)
+end
+
+---Delete aspect from the list of knwon aspects, save it to file.
+---@param name string
+---@return boolean
+---@return string
+function EssentiaMaintainer:deleteKnownAspect(name)
+    assert(name and type(name) == "string")
+    if not self.knownAspects[name] then return false, "No such aspect in known aspects list: " .. name end
+
+    self.knownAspects[name] = nil
+    local file = assert(
+        io.open(self.config.knownAspectsPath, "w"),
+        "Could not open knwon aspects file: " .. self.config.knownAspectsPath
+    )
+    assert(file:write(serialization.serialize(self.knownAspects)))
+    file:close()
+
+    return true, string.format("Deleted %s from the list of known aspects.", name)
+end
+
 ---Add an aspect to list of aspect to maintain, uses default priority from config if none given.
 ---TODO: add check against a list of known aspects
 ---@param name string
@@ -82,6 +135,10 @@ end
 function EssentiaMaintainer:addAspect(name, amount, priority)
     assert(name and type(name) == "string", "addAspect invalid argument(s)")
     assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
+
+    if not self.knownAspects[name] then
+        return false, string.format("Unknown aspect: %s; Check spelling or add it to the list of known aspects.", name)
+    end
 
     local msg = "Added aspect: "
 
@@ -200,6 +257,7 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
     self.essentiaStorage = essentiaStorage
     self:readConfig()
     self:readRecords()
+    self:readKnwonAspects()
 end
 
 ---Returns a dict of missing aspects.
