@@ -103,7 +103,7 @@ end
 ---@param name string
 ---@param maxResults integer?
 ---@return { label: string, aspects: Aspects}[] | nil
----@retrun msg?
+---@retrun string?
 function EssentiaProvider:findAspectSource(name, maxResults) return self.itemSource:findAspectSource(name, maxResults) end
 
 ---Attempts to use associated ItemSource to make missing aspects.

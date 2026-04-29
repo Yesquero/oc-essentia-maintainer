@@ -13,12 +13,8 @@ local constants = require("oces.constants")
 ---@param name string
 ---@param amount integer
 local function addAspect(Maintainer, name, amount)
-    local res = Maintainer:addAspect(name, amount)
-    if res then
-        print("Added aspect: " .. name)
-    else
-        print("Could not add aspect: " .. name)
-    end
+    local res, msg = Maintainer:addAspect(name, amount)
+    print(msg)
 end
 
 ---@param Maintainer EssentiaMaintainer

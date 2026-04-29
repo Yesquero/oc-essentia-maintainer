@@ -77,22 +77,32 @@ end
 ---@param amount integer
 ---@param priority integer?
 ---@return boolean
+---@return string
 function EssentiaMaintainer:addAspect(name, amount, priority)
     assert(name and type(name) == "string", "addAspect invalid argument(s)")
     assert(amount and type(amount == "number" and amount > 0), "addAspect invalid argument(s)")
 
+    local msg = "Added aspect: "
+
     self:readRecords()
-    self.aspectList[#self.aspectList + 1] = {
-        name = name,
-        amount = amount,
-        priority = priority or self.config.defaultPriority,
-    }
+
+    if self.aspectLookup[name] then
+        self.aspectList[self.aspectLookup[name]].amount = amount
+        msg = "Updated aspect: "
+    else
+        self.aspectList[#self.aspectList + 1] = {
+            name = name,
+            amount = amount,
+            priority = priority or self.config.defaultPriority,
+        }
+    end
+
     table.sort(self.aspectList, function(lhs, rhs) return lhs.name < rhs.name end)
 
     self:saveRecords()
     self:rebuildLookup()
 
-    return true
+    return true, msg .. name
 end
 
 ---Delete aspect with given name from the list of aspects to maintain.

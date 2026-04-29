@@ -70,6 +70,18 @@ function maintainerTest.unitTest()
     assert(#maintainer.aspectList == 2 and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Aer = 1 }))
     assert(maintainer.aspectList[1].name == "Aer")
 
+    os.remove(testConstants.recordsPath)
+    maintainer:readRecords()
+
+    res, msg = maintainer:addAspect("Vitium", 200)
+    assert(#maintainer.aspectList == 1)
+    assert(maintainer.aspectList[1].amount == 200)
+    assert(msg == "Added aspect: Vitium")
+    res, msg = maintainer:addAspect("Vitium", 400)
+    assert(#maintainer.aspectList == 1)
+    assert(maintainer.aspectList[1].amount == 400)
+    assert(msg == "Updated aspect: Vitium")
+
     print("maintainerTest.unitTest complete")
 end
 
