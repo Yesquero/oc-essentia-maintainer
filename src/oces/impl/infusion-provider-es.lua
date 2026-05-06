@@ -4,9 +4,6 @@ local IEssentiaStorage = require("oces.interface.essentia-storage")
 ---@field new fun(self, infusionProvider: TEIP): InfusionProviderES
 local InfusionProviderES = IEssentiaStorage:inherit()
 
----@type TEIP
-InfusionProviderES.component = nil
-
 function InfusionProviderES:getAspect(name) return self.component.getAspectCount(name) end
 
 function InfusionProviderES:getAspects() return self.component.getAspects() end

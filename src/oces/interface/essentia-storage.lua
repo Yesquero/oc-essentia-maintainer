@@ -2,6 +2,7 @@ local Class = require("ysq.class")
 
 ---@class IEssentiaStorage: AbstractClass
 local IEssentiaStorage = Class:inherit()
+IEssentiaStorage.component = nil
 
 ---Retruns dict of stored aspects.
 ---@return { [string]: integer }

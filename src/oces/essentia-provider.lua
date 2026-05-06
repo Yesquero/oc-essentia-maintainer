@@ -24,7 +24,7 @@ EssentiaProvider.configPath = nil
 ---Return nil if no ItemStack found.
 ---TODO: Explore ways to improve ItemStack finding algo.
 ---@param missingAspects Aspects
----@retrun integer | nil
+---@return integer | nil
 function EssentiaProvider:findItemStackToSmelt(missingAspects)
     ---@type integer
     local dbSlot = nil
