@@ -21,21 +21,21 @@ local printCfg = {
 }
 
 ---@class EssentiaMaintainer: AbstractClass
----@field aspectList {name: string, amount: integer, priority: integer}[]
----@field aspectLookup { [string]: integer }
----@field configPath string
----@field config MaintainerConfig
----@field essentiaStorage IEssentiaStorage
----@field knownAspects { [string]: boolean}
 ---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
-local EssentiaMaintainer = Class:inherit({
-    aspectList = {},
-    aspectLookup = {},
-    configPath = constants.defaultCfgPath,
-    config = config,
-    essentiaStorage = nil,
-    knownAspects = {},
-})
+local EssentiaMaintainer = Class:inherit()
+
+---@type {name: string, amount: integer, priority: integer}[]
+EssentiaMaintainer.aspectList = {}
+---@type { [string]: integer }
+EssentiaMaintainer.aspectLookup = {}
+---@type string
+EssentiaMaintainer.configPath = constants.defaultCfgPath
+---@type MaintainerConfig
+EssentiaMaintainer.config = config
+---@type IEssentiaStorage
+EssentiaMaintainer.essentiaStorage = nil
+---@type { [string]: boolean}
+EssentiaMaintainer.knownAspects = {}
 
 ---@param path string
 local function createBlankRecords(path)
