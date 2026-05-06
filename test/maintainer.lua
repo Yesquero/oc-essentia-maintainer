@@ -45,6 +45,7 @@ function maintainerTest.unitTest()
         tableEntrierPerRow = testConstants.tableEntrierPerRow,
         recordsPath = testConstants.recordsPath,
         knownAspectsPath = testConstants.knownAspectsPath,
+        aspectCombinationsPath = testConstants.aspectCombinationsPath,
     }))
 
     local knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
@@ -116,6 +117,15 @@ function maintainerTest.unitTest()
     assert(#maintainer.aspectList == 1)
     assert(maintainer.aspectList[1].amount == 400)
     assert(msg == "Updated aspect: Vitium")
+
+    assert(util.isTableEmpty(maintainer.aspectCombinations))
+    res, msg = maintainer:addCombination("Invalid", "Invalid1", "invalid2")
+    assert(not res and msg == "Unknown aspect: Invalid, check spelling or add it to the list of known aspects.")
+
+    res, msg = maintainer:addCombination("Celes", "Mana", "Ordo")
+    assert(res and util.compareTables(maintainer.aspectCombinations, { Celes = { first = "Mana", second = "Ordo" } }))
+
+    util.clearFile(maintainer.config.aspectCombinationsPath, true)
 
     print("maintainerTest.unitTest complete")
 end

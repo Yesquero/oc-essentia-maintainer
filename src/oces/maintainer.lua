@@ -14,6 +14,7 @@ local config = {
     tableEntrierPerRow = constants.tableEntrierPerRow,
     recordsPath = constants.defaultRecordsPath,
     knownAspectsPath = constants.defaultKnownAspectsPath,
+    aspectCombinationsPath = constants.aspectCombinationsPath,
 }
 
 local printCfg = {
@@ -36,9 +37,11 @@ EssentiaMaintainer.config = config
 EssentiaMaintainer.essentiaStorage = nil
 ---@type { [string]: boolean}
 EssentiaMaintainer.knownAspects = {}
+---@type { [string]: {first: string, second: string}}
+EssentiaMaintainer.aspectCombinations = {}
 
 ---@param path string
-local function createBlankRecords(path)
+local function createBlankSerializationFile(path)
     local file = assert(io.open(path, "w"))
     file:write("{}")
     file:close()
@@ -58,7 +61,7 @@ end
 ---Read list of aspects to maintain from a file.
 ---@return boolean
 function EssentiaMaintainer:readRecords()
-    if not filesystem.exists(self.config.recordsPath) then createBlankRecords(self.config.recordsPath) end
+    if not filesystem.exists(self.config.recordsPath) then createBlankSerializationFile(self.config.recordsPath) end
 
     local file =
         assert(io.open(self.config.recordsPath, "r"), "Could not open records file: " .. self.config.recordsPath)
@@ -257,6 +260,7 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
     self.essentiaStorage = essentiaStorage
     self:readConfig()
     self:readRecords()
+    self:readCombinations()
     self:readKnwonAspects()
 end
 
@@ -272,6 +276,89 @@ function EssentiaMaintainer:getMissingAspects()
     end
 
     return missingAspect
+end
+
+---Read aspect combination from a file.
+---@return boolean
+function EssentiaMaintainer:readCombinations()
+    if not filesystem.exists(self.config.aspectCombinationsPath) then
+        createBlankSerializationFile(self.config.aspectCombinationsPath)
+    end
+
+    local file = assert(
+        io.open(self.config.aspectCombinationsPath, "r"),
+        "Could not open combinations file: " .. self.config.aspectCombinationsPath
+    )
+    self.aspectCombinations = assert(
+        serialization.unserialize(file:read("a")),
+        "Error when reading combinations file: " .. self.config.aspectCombinationsPath
+    )
+    file:close()
+
+    return true
+end
+
+local function checkKnownAspect(knownAspects, aspect)
+    if not knownAspects[aspect] then
+        return false,
+            string.format("Unknown aspect: %s, check spelling or add it to the list of known aspects.", aspect)
+    else
+        return true
+    end
+end
+
+---Save current list of combinations to a file.
+function EssentiaMaintainer:saveCombinations()
+    local file = assert(
+        io.open(self.config.aspectCombinationsPath, "w"),
+        "Could not open file: " .. self.config.aspectCombinationsPath
+    )
+    assert(
+        file:write(serialization:serialize(self.aspectCombinations)),
+        "Could not write to file: " .. self.config.aspectCombinationsPath
+    )
+    file:close()
+end
+
+---Add combination to the list of combinations and save it to a file.
+---@param name string
+---@param first string
+---@param second string
+---@return boolean
+---@return string | nil
+function EssentiaMaintainer:addCombination(name, first, second)
+    assert(type(name) == "string", type(first) == "string", type(second) == "string")
+    for i, v in ipairs({ name, first, second }) do
+        local res, msg = checkKnownAspect(self.knownAspects, v)
+        if not res then return res, msg end
+    end
+
+    if self.aspectCombinations[name] then
+        return false, string.format("Combination already present: %s - %s + %s", name, first, second)
+    end
+
+    self.aspectCombinations[name] = { first = first, second = second }
+    self:saveCombinations()
+
+    return true
+end
+
+---Delete combination from the list of combinations, save changes to file.
+---@param name string
+---@return boolean
+---@return string?
+function EssentiaMaintainer:deleteCombination(name)
+    assert(type(name) == "string", "Invalid name argument: " .. name)
+
+    local res, msg = checkKnownAspect(self.knownAspects, name)
+    if not res then return false, msg end
+
+    if not self.aspectCombinations[name] then return false, "Combination not present: " .. name end
+
+    self.aspectCombinations[name] = nil
+    self:saveCombinations()
+
+    return true
 end
 
 return EssentiaMaintainer

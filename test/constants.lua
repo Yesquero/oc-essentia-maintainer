@@ -2,6 +2,7 @@ local testConstants = {
     cfgPath = "test/data/maintainer.cfg",
     recordsPath = "test/data/records.txt",
     knownAspectsPath = "test/data/known-aspects.txt",
+    aspectCombinationsPath = "test/data/combinations.txt",
     mainPollingInterval = 5,
     refillPollingInterval = 2,
     tableEntrierPerRow = 5,
