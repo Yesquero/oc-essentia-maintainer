@@ -171,6 +171,14 @@ function maintainerTest.integrationTest()
         Metallum = 991,
     }))
 
+    maintainer:addCombination("Metallum", "Ordo", "Terra")
+    assert(util.compareTables(maintainer:getMissingAspects(), {
+        Vitium = 81,
+    }))
+    assert(util.compareTables(maintainer:getMissingCombinedAspects(), {
+        Metallum = 991,
+    }))
+
     print("maintainerTest.integrationTest complete")
 end
 

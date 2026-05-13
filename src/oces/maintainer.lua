@@ -274,7 +274,7 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
     self:syncCombAndAspects()
 end
 
----Returns a dict of missing aspects.
+---Returns a dict of missing aspects, skips aspects marked as combinations.
 ---@return { [string]: integer }
 function EssentiaMaintainer:getMissingAspects()
     local storedAspects = self.essentiaStorage:getAspects()
@@ -282,11 +282,15 @@ function EssentiaMaintainer:getMissingAspects()
 
     for asp, ind in pairs(self.aspectLookup) do
         local amount = self.aspectList[ind].amount - (storedAspects[asp] or 0)
-        if amount > 0 then missingAspect[asp] = amount end
+        if not self.aspectList[ind].combination and amount > 0 then missingAspect[asp] = amount end
     end
 
     return missingAspect
 end
+
+---Returns missing combination aspect with maximum mount
+---@return nil
+function EssentiaMaintainer:getMissingCombinedAspects() error("no implementated") end
 
 ---Read aspect combination from a file.
 ---@return boolean
