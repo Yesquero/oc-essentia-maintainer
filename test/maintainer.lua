@@ -25,7 +25,7 @@ function maintainerTest.testInit()
     print("maintainerTest.testInit complete")
 end
 
-local function getKnownAspects(path)
+local function unserializeFile(path)
     local file = assert(io.open(path, "r"))
     local res = assert(serialization.unserialize(file:read("a")))
     file:close()
@@ -48,7 +48,7 @@ function maintainerTest.unitTest()
         aspectCombinationsPath = testConstants.aspectCombinationsPath,
     }))
 
-    local knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    local knwonAspects = unserializeFile(testConstants.knownAspectsPath)
     assert(util.compareTables(maintainer.knownAspects, knwonAspects))
 
     util.clearFile(maintainer.config.recordsPath, true)
@@ -65,12 +65,12 @@ function maintainerTest.unitTest()
 
     local newAspect = "Celes"
     res, msg = maintainer:addKnownAspect(newAspect)
-    knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    knwonAspects = unserializeFile(testConstants.knownAspectsPath)
     assert(res and msg == string.format("Added %s to the list of known aspects.", newAspect))
     assert(maintainer.knownAspects[newAspect] and knwonAspects[newAspect])
 
     res, msg = maintainer:deleteKnownAspect(newAspect)
-    knwonAspects = getKnownAspects(testConstants.knownAspectsPath)
+    knwonAspects = unserializeFile(testConstants.knownAspectsPath)
     assert(res and msg == string.format("Deleted %s from the list of known aspects.", newAspect))
     assert(not maintainer.knownAspects[newAspect] and not knwonAspects[newAspect])
 
@@ -83,6 +83,7 @@ function maintainerTest.unitTest()
     assert(
         #maintainer.aspectList == 3
             and util.compareTables(maintainer.aspectLookup, { Metallum = 2, Vitium = 3, Aer = 1 })
+            and maintainer.aspectList[1].combination == false
     )
     assert(maintainer.aspectList[2].name == "Metallum")
 
@@ -122,8 +123,28 @@ function maintainerTest.unitTest()
     res, msg = maintainer:addCombination("Invalid", "Invalid1", "invalid2")
     assert(not res and msg == "Unknown aspect: Invalid, check spelling or add it to the list of known aspects.")
 
-    res, msg = maintainer:addCombination("Celes", "Mana", "Ordo")
-    assert(res and util.compareTables(maintainer.aspectCombinations, { Celes = { first = "Mana", second = "Ordo" } }))
+    res, msg = maintainer:addAspect("Sanguis", 1000)
+    assert(res)
+
+    res, msg = maintainer:addCombination("Sanguis", "Mana", "Ordo")
+    assert(
+        res
+            and util.compareTables(maintainer.aspectCombinations, { Sanguis = { first = "Mana", second = "Ordo" } })
+            and maintainer.aspectList[maintainer.aspectLookup["Sanguis"]].combination
+    )
+    local combFile = unserializeFile(maintainer.config.aspectCombinationsPath)
+    assert(combFile["Sanguis"])
+
+    res, msg = maintainer:deleteCombination("Ordo")
+    assert(not res and msg == "Combination not present: Ordo" and not util.isTableEmpty(maintainer.aspectCombinations))
+    res, msg = maintainer:deleteCombination("Sanguis")
+    combFile = unserializeFile(maintainer.config.aspectCombinationsPath)
+    assert(
+        res
+            and util.isTableEmpty(maintainer.aspectCombinations)
+            and util.isTableEmpty(combFile)
+            and not maintainer.aspectList[maintainer.aspectLookup["Sanguis"]].combination
+    )
 
     util.clearFile(maintainer.config.aspectCombinationsPath, true)
 
@@ -167,11 +188,14 @@ function maintainerTest.showTest()
     maintainer:addAspect("Celes", 10000)
     maintainer:addAspect("Sonus", 1)
     maintainer:addAspect("Aer", 700)
+    maintainer:addCombination("Aer", "Ordo", "Perditio")
     print(maintainer:formattedAspectTable())
-    maintainer:addAspect("Amogus", 300)
+    maintainer:addAspect("Auram", 300)
+    maintainer:addCombination("Vitium", "Ordo", "Perditio")
     print(maintainer:formattedAspectTable())
 
     os.remove(testConstants.recordsPath)
+    os.remove(testConstants.aspectCombinationsPath)
 end
 
 return maintainerTest

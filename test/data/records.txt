@@ -1,1 +1,0 @@
-{{name="Vitium",amount=400,priority=10}}

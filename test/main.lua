@@ -16,11 +16,10 @@ local function runTests()
     maintainerTest.testInit()
     maintainerTest.unitTest()
     maintainerTest.integrationTest()
-    maintainerTest.showTest()
-
     itemDBTest.unitTest()
-
     essentiaProviderTest.integrationTest()
+
+    maintainerTest.showTest()
 
     os.remove(testConstants.recordsPath)
 

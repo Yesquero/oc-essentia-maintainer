@@ -25,7 +25,7 @@ local printCfg = {
 ---@field new fun(self,essentiaStorage: IEssentiaStorage, configPath: string?): EssentiaMaintainer
 local EssentiaMaintainer = Class:inherit()
 
----@type {name: string, amount: integer, priority: integer}[]
+---@type {name: string, amount: integer, priority: integer, combination: boolean}[]
 EssentiaMaintainer.aspectList = {}
 ---@type { [string]: integer }
 EssentiaMaintainer.aspectLookup = {}
@@ -155,6 +155,7 @@ function EssentiaMaintainer:addAspect(name, amount, priority)
             name = name,
             amount = amount,
             priority = priority or self.config.defaultPriority,
+            combination = false,
         }
     end
 
@@ -193,7 +194,7 @@ end
 function EssentiaMaintainer:formattedAspectTable()
     local storedAspects = self.essentiaStorage:getAspects()
 
-    local res = "ASPECTS: Actual / Desired\n"
+    local res = "ASPECTS: Actual / Desired; '+' -  satisfied, '-' - unsatisfied, '*' -  combination\n"
     local header =
         string.rep("-", (8 + printCfg.maxAspLen + self.config.tableMaxNumLen * 2) * self.config.tableEntrierPerRow - 1)
     res = res .. header .. "\n"
@@ -202,17 +203,25 @@ function EssentiaMaintainer:formattedAspectTable()
     for ind, val in ipairs(self.aspectList) do
         if cnt == 0 and ind ~= 1 then res = res .. "\n" end
 
-        local namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
+        local namePadding = ""
         local firstNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(storedAspects[val.name] or 0))
         local secondNumPadding = string.rep(" ", self.config.tableMaxNumLen - #tostring(val.amount))
         local mark = "-"
         if (storedAspects[val.name] or 0) >= val.amount then mark = "+" end
+        local combMark = ""
+        if val.combination then
+            combMark = "*"
+            namePadding = string.rep(" ", printCfg.maxAspLen - #val.name - 1)
+        else
+            namePadding = string.rep(" ", printCfg.maxAspLen - #val.name)
+        end
 
         res = res
             .. string.format(
-                "%s%s:%s%s%i / %i%s | ",
+                "%s%s%s:%s%s%i / %i%s | ",
                 mark,
                 val.name,
+                combMark,
                 namePadding,
                 firstNumPadding,
                 (storedAspects[val.name] or 0),
@@ -259,9 +268,10 @@ function EssentiaMaintainer:initialize(essentiaStorage, configPath)
     self.configPath = configPath or constants.defaultCfgPath
     self.essentiaStorage = essentiaStorage
     self:readConfig()
+    self:readKnwonAspects()
     self:readRecords()
     self:readCombinations()
-    self:readKnwonAspects()
+    self:syncCombAndAspects()
 end
 
 ---Returns a dict of missing aspects.
@@ -314,7 +324,7 @@ function EssentiaMaintainer:saveCombinations()
         "Could not open file: " .. self.config.aspectCombinationsPath
     )
     assert(
-        file:write(serialization:serialize(self.aspectCombinations)),
+        file:write(serialization.serialize(self.aspectCombinations)),
         "Could not write to file: " .. self.config.aspectCombinationsPath
     )
     file:close()
@@ -339,6 +349,7 @@ function EssentiaMaintainer:addCombination(name, first, second)
 
     self.aspectCombinations[name] = { first = first, second = second }
     self:saveCombinations()
+    self:syncCombAndAspects()
 
     return true
 end
@@ -357,8 +368,20 @@ function EssentiaMaintainer:deleteCombination(name)
 
     self.aspectCombinations[name] = nil
     self:saveCombinations()
+    self:syncCombAndAspects()
 
     return true
+end
+
+---Go over the list of combinations and mark associated maintaianed aspects as combinations.
+function EssentiaMaintainer:syncCombAndAspects()
+    for ind, val in ipairs(self.aspectList) do
+        if self.aspectCombinations[val.name] then
+            self.aspectList[ind].combination = true
+        else
+            self.aspectList[ind].combination = false
+        end
+    end
 end
 
 return EssentiaMaintainer
